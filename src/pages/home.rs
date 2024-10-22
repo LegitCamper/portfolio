@@ -24,6 +24,7 @@ pub fn Home() -> impl IntoView {
 
             <NavBar></NavBar>
             <Intro></Intro>
+            <AboutMe></AboutMe>
             <Projects></Projects>
 
         </ErrorBoundary>
@@ -39,7 +40,6 @@ pub fn Intro() -> impl IntoView {
             <h3>
                 "A systems programmer with a passion for self-hosting, devops, and working with Rust"
             </h3>
-            <button>"See my work"</button>
 
             <div class="socials">
                 <a class="devicon-github-original" href="https://github.com/LegitCamper"></a>
@@ -49,6 +49,22 @@ pub fn Intro() -> impl IntoView {
                 ></a>
                 <a class="devicon-twitter-original" href="https://x.com/BristolSawyer"></a>
             </div>
+            <div class="scroll-down">
+                <a href="#about_me">"Scroll Down"
+                    <span class="mouse">
+                        <span class="wheel"></span>
+                    </span>
+                </a>
+            </div>
+        </div>
+    }
+}
+
+#[component]
+pub fn AboutMe() -> impl IntoView {
+    view! {
+        <div class="container" id="about_me">
+            <h1>"About Me"</h1>
         </div>
     }
 }
