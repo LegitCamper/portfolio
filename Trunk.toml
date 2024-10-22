@@ -1,0 +1,6 @@
+[serve]
+port = 8000
+
+[build]
+target = "index.html"
+release = true

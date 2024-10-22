@@ -1,0 +1,63 @@
+body {
+  font-family: sans-serif;
+  text-align: center;
+  background-color: #24273a;
+}
+
+.navbar {
+  overflow: hidden;
+  background-color: #181926;
+  position: fixed; /* Set the navbar to fixed position */
+  top: 0; /* Position the navbar at the top of the page */
+  width: 100%; /* Full width */
+}
+
+.navbar a {
+  float: left;
+  display: block;
+  color: #cad3f5;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+.navbar a:hover {
+  background: #939ab7;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 30px; /* Add a top margin to avoid content overlay */
+  justify-content: center;
+  text-align: center;
+  min-height: 100vh;
+}
+
+#intro {
+  color: #cad3f5;
+  vertical-align: middle;
+  flex-wrap: wrap;
+}
+
+.socials {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  font-size: 40px;
+  margin-top: 30px;
+  margin: 50;
+}
+
+.socials a {
+  color: white;
+  text-decoration: none;
+}
+
+#projects {
+  color: #cad3f5;
+  vertical-align: middle;
+  flex-wrap: wrap;
+}
