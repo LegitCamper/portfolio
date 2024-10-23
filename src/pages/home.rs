@@ -115,7 +115,7 @@ pub fn AboutMe() -> impl IntoView {
                 }"
             </style>
             <div class="about_me_box">
-                <img src="assets/headshot.jpg" width="145" height="210" />
+                <img src="assets/me_programming.jpg" width="145" height="210" />
                 <style>
                     ".bio{
                     display: flex;
@@ -135,8 +135,8 @@ pub fn AboutMe() -> impl IntoView {
                     <p>
                         "A passionate systems programmer
                         with a strong interest in DevOps, 
-                        eager to apply my skills and 
-                        contribute to solving difficult issues."
+                        eager to apply my skills to
+                        contribute and solve difficult problems."
                     </p>
 
                     <style>
