@@ -1,3 +1,4 @@
+use crate::components::ProgressBar;
 use leptos::*;
 
 /// Default Home Page
@@ -35,10 +36,10 @@ pub fn Home() -> impl IntoView {
 pub fn Intro() -> impl IntoView {
     view! {
         <div class="container" id="intro">
-            <img src="headshot.jpg" width="200" height="300" />
+            <img src="assets/headshot.jpg" width="200" height="300" />
             <h1>"Sawyer Bristol"</h1>
             <h3>
-                "A systems programmer with a passion for self-hosting, devops, and working with Rust"
+                "A systems programmer who loves Rust"
             </h3>
 
             <div class="socials">
@@ -49,6 +50,7 @@ pub fn Intro() -> impl IntoView {
                 ></a>
                 <a class="devicon-twitter-original" href="https://x.com/BristolSawyer"></a>
             </div>
+
             <div class="scroll-down">
                 <a href="#about_me">"Scroll Down"
                     <span class="mouse">
@@ -65,6 +67,13 @@ pub fn AboutMe() -> impl IntoView {
     view! {
         <div class="container" id="about_me">
             <h1>"About Me"</h1>
+
+            <div class="languages">
+            <a>"Rust"</a>
+            <ProgressBar progress=75></ProgressBar>
+            </div>
+
+            <a href="assets/resume.pdf">"Download my resume"</a>
         </div>
     }
 }

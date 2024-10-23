@@ -2,6 +2,7 @@ use leptos::*;
 use leptos_meta::*;
 use leptos_router::*;
 
+mod components;
 mod pages;
 
 // Top-Level pages
