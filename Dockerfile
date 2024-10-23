@@ -2,6 +2,8 @@ FROM rust:latest
 
 WORKDIR /usr/src/portfolio
 
+EXPOSE 8000
+
 # deps
 RUN apt install git && \
   cargo install typst-cli && \
