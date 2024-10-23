@@ -17,8 +17,6 @@ pub fn App() -> impl IntoView {
 
     view! {
         <Html lang="en" dir="ltr" attr:data-theme="dark" />
-
-        // sets the document title
         <Title text="Portfolio | Sawyer Bristol" />
 
         // injects metadata in the <head> of the page

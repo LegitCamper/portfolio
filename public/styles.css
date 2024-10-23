@@ -31,41 +31,7 @@ body {
   align-items: center;
   justify-content: center;
   text-align: center;
-  min-height: 100vh;
-}
-
-#intro {
-  color: #cad3f5;
-  vertical-align: middle;
-  flex-wrap: wrap;
-}
-
-.socials {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-around;
-  align-items: center;
-  font-size: 40px;
-  padding: 10px;
-  margin: 50;
-}
-
-.socials a {
-  color: white;
-  text-decoration: none;
-  padding: 20px;
-}
-
-#about_me {
-  color: #cad3f5;
-  vertical-align: middle;
-  flex-wrap: wrap;
-}
-
-#projects {
-  color: #cad3f5;
-  vertical-align: middle;
-  flex-wrap: wrap;
+  min-height: 25vh;
 }
 
 .scroll-down {
