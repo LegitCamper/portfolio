@@ -293,7 +293,10 @@ pub fn Projects() -> impl IntoView {
                     "I can't forget about this site!
                     A static site written in Rust and WebAssembly. 
                     It uses the Leptos framework to create
-                    blazingly fast static sites like this one"
+                    blazingly fast static sites like this one.
+                    I am using github actions to build a new container
+                    and my homelab repo to automatically run ansible 
+                    and redeploy this site"
                 </p>
             </div>
         </div>
