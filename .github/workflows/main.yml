@@ -1,0 +1,19 @@
+name: Deploy Images to GHCR
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+      push-store-image:
+        runs-on: ubuntu-latest
+        steps:
+          - name: 'Checkout GitHub Action'
+            uses: actions/checkout@main
+
+          - name: 'Build Inventory Image'
+            run: |
+              docker build . --tag registry.sawyer.services/legitcamper/portfolio:latest
+              docker push registry.sawyer.services/legitcamper/portfolio:latest
