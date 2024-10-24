@@ -2,8 +2,6 @@ FROM rust:latest
 
 WORKDIR /usr/src/portfolio
 
-EXPOSE 8000
-
 # deps
 RUN apt install git && \
   cargo install typst-cli && \
@@ -13,6 +11,10 @@ RUN apt install git && \
 COPY . .
 
 RUN cargo install trunk && trunk build
+
+RUN apt clean
+
+EXPOSE 8000
 
 CMD trunk serve
 
