@@ -261,7 +261,9 @@ pub fn Projects() -> impl IntoView {
                 }"
             </style>
             <div class="homelab">
-                <h3><a href="https://github.com/LegitCamper/homelab">"My homelab repo"</a></h3>
+                <h3>
+                    <a href="https://github.com/LegitCamper/homelab">"My homelab repo"</a>
+                </h3>
                 <p>
                     "This is repo where I host all the containers
                      I use in my Homelab along with all the Ansible 
@@ -288,7 +290,9 @@ pub fn Projects() -> impl IntoView {
                 }"
             </style>
             <div class="portfolio">
-                <h3><a href="https://github.com/LegitCamper/portfolio">"My portfolio site!"</a></h3>
+                <h3>
+                    <a href="https://github.com/LegitCamper/portfolio">"My portfolio site!"</a>
+                </h3>
                 <p>
                     "I can't forget about this site!
                     A static site written in Rust and WebAssembly. 
@@ -310,7 +314,6 @@ pub fn NavBar() -> impl IntoView {
             <a href="#intro">Home</a>
             <a href="#about_me">About Me</a>
             <a href="#projects">Projects</a>
-            <a href="#contact">Contact</a>
         </div>
     }
 }
