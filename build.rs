@@ -1,3 +1,5 @@
+use std::path::Path;
+
 fn main() {
     let dir = std::env::var("OUT_DIR").unwrap();
     std::process::Command::new("git")
@@ -12,4 +14,6 @@ fn main() {
         ])
         .spawn()
         .expect("Failed to compile resume");
+
+    assert!(Path::new("public/assets/resume.pdf").exists());
 }
