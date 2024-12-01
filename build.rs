@@ -10,7 +10,7 @@ fn main() {
     std::process::Command::new("typst")
         .args([
             "compile",
-            &format!("{}/resume.typ", &dir),
+            &format!("{}/resume/resume.typ", &dir),
             &format!("{}/{}", cargo_dir, "public/assets/resume.pdf"),
         ])
         .spawn()

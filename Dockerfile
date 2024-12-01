@@ -6,11 +6,12 @@ WORKDIR /usr/src/portfolio
 RUN apt install git && \
   cargo install typst-cli && \
   rustup toolchain install nightly && \
-  rustup target add wasm32-unknown-unknown --toolchain nightly
+  rustup target add wasm32-unknown-unknown --toolchain nightly && \
+  cargo install trunk 
 
 COPY . .
 
-RUN cargo install trunk && trunk build
+RUN trunk build
 
 RUN apt clean
 
