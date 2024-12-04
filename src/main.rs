@@ -1,5 +1,8 @@
-use leptos::*;
+use leptos::prelude::*;
 use leptos_meta::*;
+use leptos_router::components::*;
+use leptos_router::hooks::use_params_map;
+use leptos_router::path;
 use leptos_router::*;
 
 mod pages;
@@ -20,6 +23,11 @@ fn Cert_Redirect(url: &'static str) -> impl IntoView {
     }
 }
 
+#[component]
+fn Cert_Download(path: &'static str) -> impl IntoView {
+    view! {}
+}
+
 /// An app router which renders the homepage and handles 404's
 #[component]
 pub fn App() -> impl IntoView {
@@ -27,7 +35,7 @@ pub fn App() -> impl IntoView {
     provide_meta_context();
 
     view! {
-        <Html lang="en" dir="ltr" attr:data-theme="dark" />
+        // <Html lang="en" dir="ltr" attr:data-theme="dark" />
         <Title text="Portfolio | Sawyer Bristol" />
 
         // injects metadata in the <head> of the page
@@ -35,19 +43,19 @@ pub fn App() -> impl IntoView {
         <Meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
         <Router>
-            <Routes>
-                <Route path="/" view=Home />
+            <Routes fallback=NotFound>
+                <Route path=path!("") view=Home />
 
                 <Route
-                    path="/secplus"
+                    path=path!("secplus")
                     view=|| {
                         view! {
-                            <Cert_Redirect url="https://www.credly.com/earner/earned/badge/ee6d361d-f5a0-477e-8781-dac694de1576" />
+                            <Redirect path="/assets/SecurityPlus.pdf" />
                         }
                     }
                 />
                 <Route
-                    path="/ccna"
+                    path=path!("ccna")
                     view=|| {
                         view! {
                             <Cert_Redirect url="https://www.credly.com/earner/earned/badge/5fb6df62-6a0c-4726-ba18-f53ac658848e" />
@@ -55,31 +63,29 @@ pub fn App() -> impl IntoView {
                     }
                 />
                 <Route
-                    path="/conf"
+                    path=path!("conf")
                     view=|| {
                         view! {
-                            <Cert_Redirect url="https://certificates.cloudacademy.com/f6dc9411a22f9bd18e3da429caf6690cf3264e4c.pdf" />
+                            <Redirect path="/assets/AzureConfig.pdf" />
                         }
                     }
                 />
                 <Route
-                    path="/oss"
+                    path=path!("oss")
                     view=|| {
                         view! {
-                            <Cert_Redirect url="https://certificates.cloudacademy.com/bc74fa5d870d4a33fab262d7820e685999c6bb1d.pdf" />
+                            <Redirect path="/assets/AzureOss.pdf" />
                         }
                     }
                 />
                 <Route
-                    path="/itfplus"
+                    path=path!("itfplus")
                     view=|| {
                         view! {
-                            <Cert_Redirect url="https://www.credly.com/earner/earned/badge/1e791160-f8c8-4306-87a1-f3a480898ad6" />
+                            <Redirect path="/assets/ITFPlus.pdf" />
                         }
                     }
                 />
-
-                <Route path="/*" view=NotFound />
             </Routes>
         </Router>
     }
