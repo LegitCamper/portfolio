@@ -1,9 +1,7 @@
 use leptos::prelude::*;
 use leptos_meta::*;
 use leptos_router::components::*;
-use leptos_router::hooks::use_params_map;
 use leptos_router::path;
-use leptos_router::*;
 
 mod pages;
 // Top-Level pages
@@ -21,11 +19,6 @@ fn Cert_Redirect(url: &'static str) -> impl IntoView {
             <Meta http_equiv="refresh" content=format!("3;url={}", url) />
         </main>
     }
-}
-
-#[component]
-fn Cert_Download(path: &'static str) -> impl IntoView {
-    view! {}
 }
 
 /// An app router which renders the homepage and handles 404's
