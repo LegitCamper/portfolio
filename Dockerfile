@@ -13,8 +13,6 @@ COPY . .
 
 RUN trunk build
 
-RUN apt clean
-
 EXPOSE 8000
 
 CMD trunk serve
