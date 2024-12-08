@@ -6,7 +6,9 @@ fn main() {
     std::process::Command::new("git")
         .args(["clone", "https://github.com/LegitCamper/resume", &dir])
         .spawn()
-        .expect("Failed to clone resume repo");
+        .expect("Failed to clone resume repo")
+        .wait()
+        .unwrap();
     std::process::Command::new("typst")
         .args([
             "compile",
@@ -14,7 +16,9 @@ fn main() {
             &format!("{}/{}", cargo_dir, "public/assets/resume.pdf"),
         ])
         .spawn()
-        .expect("Failed to compile resume");
+        .expect("Failed to compile resume")
+        .wait()
+        .unwrap();
 
     assert!(Path::new(&cargo_dir)
         .join("public/assets/resume.pdf")

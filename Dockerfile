@@ -1,21 +1,30 @@
-FROM rust:latest
+# Get started with a build env with Rust nightly
+FROM rustlang/rust:nightly-alpine as builder
 
-WORKDIR /usr/src/portfolio
+RUN apk update && \
+    apk add --no-cache bash curl npm libc-dev binaryen
 
-# deps
-RUN apt install git && \
-  cargo install typst-cli && \
-  rustup toolchain install nightly && \
-  rustup target add wasm32-unknown-unknown --toolchain nightly && \
-  cargo install trunk 
+RUN curl --proto '=https' --tlsv1.2 -LsSf https://github.com/leptos-rs/cargo-leptos/releases/latest/download/cargo-leptos-installer.sh | sh
 
+# Add the WASM target
+RUN rustup target add wasm32-unknown-unknown
+
+WORKDIR /work
 COPY . .
 
-RUN trunk build
+RUN cargo leptos build --release -vv
 
-RUN apt clean
+FROM rustlang/rust:nightly-alpine as runner
 
+WORKDIR /app
+
+COPY --from=builder /work/target/release/portfolio /app/
+COPY --from=builder /work/target/site /app/site
+COPY --from=builder /work/Cargo.toml /app/
+
+ENV RUST_LOG="info"
+ENV LEPTOS_SITE_ADDR="0.0.0.0:8000"
+ENV LEPTOS_SITE_ROOT=./site
 EXPOSE 8000
 
-CMD trunk serve
-
+CMD ["/app/portfolio"]
