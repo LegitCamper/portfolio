@@ -2,9 +2,10 @@
 FROM rustlang/rust:nightly-alpine as builder
 
 RUN apk update && \
-    apk add --no-cache bash curl npm libc-dev binaryen
+    apk add --no-cache bash curl npm libc-dev binaryen git pkgconf openssl openssl-dev
 
 RUN curl --proto '=https' --tlsv1.2 -LsSf https://github.com/leptos-rs/cargo-leptos/releases/latest/download/cargo-leptos-installer.sh | sh
+RUN cargo install typst-cli
 
 # Add the WASM target
 RUN rustup target add wasm32-unknown-unknown
