@@ -34,6 +34,29 @@ body {
   min-height: 25vh;
 }
 
+.box {
+  background: #494d64; 
+  border-radius: 30px;
+  width: 65%;
+  margin: 10px;
+  padding: 10px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  flex-direction: column;
+}
+
+.box p {
+  max-width: 80%;
+  align-items: center;
+  overflow-wrap: break-word;
+  white-space: normal;
+}
+
+.box a {
+  color: #3489ee;
+}
+
 .scroll-down {
   position: absolute;
   bottom: 2.5rem;

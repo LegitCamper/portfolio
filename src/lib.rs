@@ -16,14 +16,14 @@ pub fn shell(options: LeptosOptions) -> impl IntoView {
         <!DOCTYPE html>
         <html lang="en">
             <head>
-                <meta charset="utf-8"/>
-                <meta name="viewport" content="width=device-width, initial-scale=1"/>
+                <meta charset="utf-8" />
+                <meta name="viewport" content="width=device-width, initial-scale=1" />
                 <AutoReload options=options.clone() />
-                <HydrationScripts options/>
-                <MetaTags/>
+                <HydrationScripts options />
+                <MetaTags />
             </head>
             <body>
-                <App/>
+                <App />
             </body>
         </html>
     }
@@ -51,7 +51,7 @@ pub fn App() -> impl IntoView {
     view! {
         // injects a stylesheet into the document <head>
         // id=leptos means cargo-leptos will hot-reload this stylesheet
-        <Stylesheet id="leptos" href="/pkg/portfolio.css"/>
+        <Stylesheet id="leptos" href="/pkg/portfolio.css" />
 
         // <Html lang="en" dir="ltr" attr:data-theme="dark" />
         <Title text="Portfolio | Sawyer Bristol" />
@@ -63,9 +63,7 @@ pub fn App() -> impl IntoView {
                 <Route
                     path=StaticSegment("secplus")
                     view=|| {
-                        view! {
-                            <Redirect path="/assets/SecurityPlus.pdf" />
-                        }
+                        view! { <Redirect path="/assets/SecurityPlus.pdf" /> }
                     }
                 />
                 <Route
@@ -79,25 +77,19 @@ pub fn App() -> impl IntoView {
                 <Route
                     path=StaticSegment("conf")
                     view=|| {
-                        view! {
-                            <Redirect path="/assets/AzureConfig.pdf" />
-                        }
+                        view! { <Redirect path="/assets/AzureConfig.pdf" /> }
                     }
                 />
                 <Route
                     path=StaticSegment("oss")
                     view=|| {
-                        view! {
-                            <Redirect path="/assets/AzureOss.pdf" />
-                        }
+                        view! { <Redirect path="/assets/AzureOss.pdf" /> }
                     }
                 />
                 <Route
                     path=StaticSegment("itfplus")
                     view=|| {
-                        view! {
-                            <Redirect path="/assets/ITFPlus.pdf" />
-                        }
+                        view! { <Redirect path="/assets/ITFPlus.pdf" /> }
                     }
                 />
             </Routes>

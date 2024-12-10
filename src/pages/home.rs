@@ -101,94 +101,32 @@ pub fn AboutMe() -> impl IntoView {
         </style>
         <div class="container" id="about_me">
             <h1>"About Me"</h1>
-
-            <style>
-                ".about_me_box{
-                    background: #494d64; 
-                    border-radius: 30px;
-                    width:50%;
-                    margin: 10px;
-                    padding: 10px;
-                    display: flex;
-                    flex-direction: row;
-                    justify-content: space-around;
-                    align-items: center;
-                }"
-            </style>
-            <div class="about_me_box">
+            <div class="box">
                 <img src="assets/me_programming.jpg" width="145" height="210" />
-                <style>
-                    ".bio{
-                        display: flex;
-                        width: 25%;
-                        flex-direction: column;
-                        justify-content: space-around;
-                        align-items: center;
-                        padding: 10px;
-                        margin: 50;
-                    }
-                    .bio p {
-                        overflow-wrap: break-word;
-                        white-space: normal;
-                    }"
-                </style>
-                <div class="bio">
-                    <p>
-                        "A passionate systems programmer
-                        with a strong interest in DevOps, 
-                        eager to apply my skills to
-                        contribute and solve difficult problems."
-                    </p>
-
-                    <style>
-                        ".resume_download {
-                            background-color: #b7bdf8;
-                            border-radius: 30px;
-                            color: #181926;
-                            padding: 12px 20px;
-                            cursor: pointer;
-                            font-size: 15px;
-                        }"
-                    </style>
-                    <button class="resume_download" onclick="location.href='assets/resume.pdf'">
-                        "Download Resume"
-                    </button>
-                </div>
+                <p>
+                    "As an experienced Rust developer with a passion for systems development,
+                    embedded devices, DevOps, and self-hosting, I am dedicated to creating safe 
+                    and high-performant software solutions that solve real world problems. 
+                    With a strong drive to learn and grow as a programmer, I am constantly 
+                    make a meaningful impact on people's livesseeking out new challenges and 
+                    opportunities to improve my skills and expertise. 
+                    Check out my resume or projects below for more examples of what I build!"
+                </p>
 
                 <style>
-                    ".skills {
-                        display: flex;
-                        flex-direction: column;
-                        justify-content: space-around;
-                        align-items: center;
-                        padding: 10px;
-                        align-items: start;
-                        margin: 50;
-                    }
-                    .skills p {
-                        text-align: left
-                        padding: 10px;
-                        margin: 10px;
+                    ".resume_download {
+                        background-color: #b7bdf8;
+                        border-radius: 30px;
+                        color: #181926;
+                        padding: 12px 20px;
+                        cursor: pointer;
+                        font-size: 15px;
+                        max-width: 500px;
                     }"
                 </style>
-                <div class="skills">
-                    <p align="center" style="font-size: 25px;">
-                        "Skills"
-                    </p>
-                    <p>
-                        "• Programming Languages: Bash, Rust, Golang, C, Python, Lua, Nix/NixOs"
-                    </p>
-                    <p>
-                        "• Deployment Technologies: Kubernetes, Docker, GitHub Actions, Azure Dev Ops, Ansible, CI/CD"
-                    </p>
-                    <p>"• Infrastructure: AWS, Azure, Google Cloud, Digital Ocean"</p>
-                    <p>
-                        "• Networking: Nginx/Traefik(HTTP, HTTPS, TCP, UDP routing), IPTables, Tailscale"
-                    </p>
-                    <p>
-                        "• Interests: Systems & Embedded programming, Cyber-security, and self-hosting"
-                    </p>
-                </div>
+                <button class="resume_download" onclick="location.href='assets/resume.pdf'">
+                    "Download Resume"
+                </button>
             </div>
         </div>
     }
@@ -206,29 +144,18 @@ pub fn Projects() -> impl IntoView {
         </style>
         <div class="container" id="projects">
             <h1>"Projects"</h1>
-
-            <style>
-                ".icy_browser {
-                    background: #494d64; 
-                    border-radius: 30px;
-                    width:50%;
-                    margin: 10px;
-                    padding: 10px;
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: space-around;
-                    align-items: center;
-                }
-                .icy_browser a {
-                    color: #3489ee;
-                }"
-            </style>
-            <div class="icy_browser">
+            <div class="box">
                 <h3>"Icy Browser & Components"</h3>
+                <style>
+                    ".icy_browser_img {
+                        max-width: 85%;
+                        min-width: 225px;
+                        height: auto;
+                    }"
+                </style>
                 <img
+                    class="icy_browser_img"
                     src="https://github.com/LegitCamper/icy_browser/blob/main/assets/basic_browser.png?raw=true"
-                    width="800"
-                    height="300"
                 />
                 <a href="https://github.com/LegitCamper/iced_webview">"Iced Webview"</a>
                 <p>"A Iced library to embed webpages in native iced applications"</p>
@@ -244,23 +171,7 @@ pub fn Projects() -> impl IntoView {
                 </p>
             </div>
 
-            <style>
-                ".homelab{
-                    background: #494d64; 
-                    border-radius: 30px;
-                    width:50%;
-                    margin: 10px;
-                    padding: 10px;
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: space-around;
-                    align-items: center;
-                }
-                .homelab a {
-                    color: #3489ee;
-                }"
-            </style>
-            <div class="homelab">
+            <div class="box">
                 <h3>
                     <a href="https://github.com/LegitCamper/homelab">"My homelab repo"</a>
                 </h3>
@@ -273,23 +184,7 @@ pub fn Projects() -> impl IntoView {
                 </p>
             </div>
 
-            <style>
-                ".portfolio{
-                    background: #494d64; 
-                    border-radius: 30px;
-                    width:50%;
-                    margin: 10px;
-                    padding: 10px;
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: space-around;
-                    align-items: center;
-                }
-                .portfolio a {
-                    color: #3489ee;
-                }"
-            </style>
-            <div class="portfolio">
+            <div class="box">
                 <h3>
                     <a href="https://github.com/LegitCamper/portfolio">"My portfolio site!"</a>
                 </h3>
