@@ -92,6 +92,12 @@ pub fn App() -> impl IntoView {
                         view! { <Redirect path="/assets/ITFPlus.pdf" /> }
                     }
                 />
+                <Route
+                    path=StaticSegment("linuxplus")
+                    view=|| {
+                        view! { <Redirect path="/assets/LinuxPlus.pdf" /> }
+                    }
+                />
             </Routes>
         </Router>
     }
