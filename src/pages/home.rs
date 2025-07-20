@@ -193,7 +193,7 @@ pub fn Skills() -> impl IntoView {
     view! {
         <div class="section" id="skills">
             <div class="section_box">
-            <h1>"Skills"</h1>
+                <h1>"Skills"</h1>
                 <div class="skills">
                     <p>
                         "• Programming Languages: Bash, Rust, Golang, C, Python, Lua, Nix/NixOs"

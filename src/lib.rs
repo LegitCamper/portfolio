@@ -22,7 +22,10 @@ pub fn shell(options: LeptosOptions) -> impl IntoView {
                 <HydrationScripts options />
                 <MetaTags />
 
-                <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css" />
+                <link
+                    rel="stylesheet"
+                    href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css"
+                />
 
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -43,11 +46,11 @@ pub fn shell(options: LeptosOptions) -> impl IntoView {
                     h1 {
                         font-size: 2.5rem;
                     }
-
+                    
                     h2 {
                         font-size: 2rem;
                     }
-
+                    
                     p {
                         line-height: 1.6;
                     }"
