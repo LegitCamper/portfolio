@@ -12,7 +12,7 @@ RUN rustup target add wasm32-unknown-unknown
 WORKDIR /work
 COPY . .
 
-RUN cargo leptos build --release -vv
+RUN cargo +nightly leptos build --release -vv
 
 FROM rustlang/rust:nightly-alpine as runner
 
