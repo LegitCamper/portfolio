@@ -8,27 +8,51 @@ const CELL_SIZE: f32 = 20.; // pixels per cell
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
+        .init_state::<GameState>()
         .insert_resource(Score(0))
+        .insert_resource(SnakeBody {
+            positions: vec![IVec2::new(10, 10)],
+        })
+        .insert_resource(SnakeDirection(Direction::Up))
         .add_event::<FruitEatenEvent>()
         .add_systems(Startup, setup)
         .add_systems(
             Update,
             (
-                move_snake,
-                handle_input,
-                handle_fruit_eaten,
-                check_collisions,
+                start.run_if(in_state(GameState::GameOver)),
+                handle_input.run_if(in_state(GameState::Running)),
+                move_snake.run_if(in_state(GameState::Running)),
+                check_death_collision.run_if(in_state(GameState::Running)),
+                check_fruit_collision.run_if(in_state(GameState::Running)),
+                handle_fruit_eaten.run_if(in_state(GameState::Running)),
+                grow_snake.run_if(in_state(GameState::Running)),
                 update_score_text,
-            ),
+            )
+                .chain(),
         )
+        .add_systems(OnEnter(GameState::GameOver), show_start_text)
+        .add_systems(OnEnter(GameState::Running), hide_start_text)
+        .add_systems(OnEnter(GameState::GameOver), cleanup_entities)
         .run();
 }
 
-#[derive(Component)]
-struct Snake {
-    direction: Direction,
-    position: IVec2, // grid coords
+#[derive(States, Clone, Eq, PartialEq, Debug, Hash, Default)]
+enum GameState {
+    Running,
+    #[default]
+    GameOver,
 }
+
+#[derive(Resource)]
+struct SnakeBody {
+    positions: Vec<IVec2>, // positions[0] is the head, positions[n] is the tail
+}
+
+#[derive(Component)]
+struct SnakeSegment;
+
+#[derive(Resource, Deref, DerefMut)]
+struct SnakeDirection(Direction);
 
 #[derive(Clone, Copy, PartialEq)]
 enum Direction {
@@ -52,13 +76,17 @@ struct Score(usize);
 #[derive(Component)]
 struct ScoreText;
 
+#[derive(Component)]
+struct StartText;
+
 fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
     mut asset_server: Res<AssetServer>,
 ) {
-    let mut rng = rand::rng();
+    // snake starts with length 1 at (10, 10)
+    let start_pos = IVec2::new(10, 10);
 
     commands.spawn(Camera2d);
 
@@ -82,19 +110,39 @@ fn setup(
             ));
         }
     }
+}
 
-    spawn_fruit(&mut commands, &mut meshes, &mut materials);
+fn start(
+    keys: Res<ButtonInput<KeyCode>>,
+    mut commands: Commands,
+    mut next_state: ResMut<NextState<GameState>>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
+    mut asset_server: Res<AssetServer>,
+    mut score: ResMut<Score>,
+    mut snake_direction: ResMut<SnakeDirection>,
+    mut snake: ResMut<SnakeBody>,
+) {
+    if keys.just_pressed(KeyCode::Space) {
+        // snake starts with length 1 at (10, 10)
+        let start_pos = IVec2::new(10, 10);
 
-    let snake_pos = IVec2::new(10, 10);
-    commands.spawn((
-        Mesh2d(meshes.add(Rectangle::new(CELL_SIZE, CELL_SIZE))),
-        MeshMaterial2d(materials.add(Color::srgb_u8(160, 204, 15))),
-        Transform::from_translation(grid_to_world(snake_pos)),
-        Snake {
-            direction: Direction::Up,
-            position: snake_pos,
-        },
-    ));
+        snake.positions.clear();
+        snake.positions.push(start_pos);
+        score.0 = 0;
+        snake_direction.0 = Direction::Up;
+
+        commands.spawn((
+            Mesh2d(meshes.add(Rectangle::new(CELL_SIZE, CELL_SIZE))),
+            MeshMaterial2d(materials.add(Color::srgb_u8(160, 204, 15))),
+            Transform::from_translation(grid_to_world(start_pos)),
+            SnakeSegment,
+        ));
+
+        spawn_fruit(&mut commands, &mut meshes, &mut materials);
+
+        next_state.set(GameState::Running);
+    }
 }
 
 fn grid_to_world(pos: IVec2) -> Vec3 {
@@ -103,48 +151,49 @@ fn grid_to_world(pos: IVec2) -> Vec3 {
     Vec3::new(world_x, world_y, 0.0)
 }
 
-fn handle_input(keyboard_input: Res<ButtonInput<KeyCode>>, mut query: Query<&mut Snake>) {
-    for mut snake in &mut query {
-        if keyboard_input.just_pressed(KeyCode::ArrowUp) && snake.direction != Direction::Down {
-            snake.direction = Direction::Up;
-        }
-        if keyboard_input.just_pressed(KeyCode::ArrowDown) && snake.direction != Direction::Up {
-            snake.direction = Direction::Down;
-        }
-        if keyboard_input.just_pressed(KeyCode::ArrowLeft) && snake.direction != Direction::Right {
-            snake.direction = Direction::Left;
-        }
-        if keyboard_input.just_pressed(KeyCode::ArrowRight) && snake.direction != Direction::Left {
-            snake.direction = Direction::Right;
-        }
+fn handle_input(keyboard_input: Res<ButtonInput<KeyCode>>, mut direction: ResMut<SnakeDirection>) {
+    if keyboard_input.just_pressed(KeyCode::ArrowUp) && direction.0 != Direction::Down {
+        direction.0 = Direction::Up;
+    }
+    if keyboard_input.just_pressed(KeyCode::ArrowDown) && direction.0 != Direction::Up {
+        direction.0 = Direction::Down;
+    }
+    if keyboard_input.just_pressed(KeyCode::ArrowLeft) && direction.0 != Direction::Right {
+        direction.0 = Direction::Left;
+    }
+    if keyboard_input.just_pressed(KeyCode::ArrowRight) && direction.0 != Direction::Left {
+        direction.0 = Direction::Right;
     }
 }
 
 fn move_snake(
     time: Res<Time>,
-    mut query: Query<(&mut Snake, &mut Transform)>,
+    mut body: ResMut<SnakeBody>,
+    mut segments: Query<&mut Transform, With<SnakeSegment>>,
     mut timer: Local<Timer>,
+    direction: Res<SnakeDirection>,
 ) {
-    // initialize timer once
     if timer.duration().is_zero() {
         *timer = Timer::from_seconds(0.2, TimerMode::Repeating);
     }
-
     if !timer.tick(time.delta()).just_finished() {
         return;
     }
 
-    for (mut snake, mut transform) in &mut query {
-        // Move one cell based on stored direction
-        match snake.direction {
-            Direction::Up => snake.position.y += 1,
-            Direction::Down => snake.position.y -= 1,
-            Direction::Left => snake.position.x -= 1,
-            Direction::Right => snake.position.x += 1,
-        }
+    // Move body positions
+    let mut new_head = body.positions[0];
+    match direction.0 {
+        Direction::Up => new_head.y += 1,
+        Direction::Down => new_head.y -= 1,
+        Direction::Left => new_head.x -= 1,
+        Direction::Right => new_head.x += 1,
+    }
+    body.positions.insert(0, new_head);
+    body.positions.pop();
 
-        // Update transform
-        transform.translation = grid_to_world(snake.position);
+    // Sync entity transforms with body
+    for (pos, mut transform) in body.positions.iter().zip(segments.iter_mut()) {
+        transform.translation = grid_to_world(*pos);
     }
 }
 
@@ -167,24 +216,38 @@ fn spawn_fruit(
     ));
 }
 
-fn check_collisions(
-    mut snake_query: Query<&Snake>,
-    mut fruit_query: Query<(Entity, &Fruit)>,
-    mut commands: Commands,
-    mut writer: EventWriter<FruitEatenEvent>,
+fn check_fruit_collision(
+    body: Res<SnakeBody>,
+    fruits: Query<&Fruit>,
+    mut events: EventWriter<FruitEatenEvent>,
 ) {
-    for snake in &mut snake_query {
-        for (fruit_entity, fruit) in &mut fruit_query {
-            if snake.position == fruit.position {
-                writer.write(FruitEatenEvent);
-            }
+    let head = body.positions[0];
+    for fruit in &fruits {
+        if fruit.position == head {
+            events.send(FruitEatenEvent); // only sends event
         }
+    }
+}
+
+fn check_death_collision(body: Res<SnakeBody>, mut next_state: ResMut<NextState<GameState>>) {
+    let head = body.positions[0];
+
+    // wall collision
+    if head.x < 0 || head.x >= GRID_WIDTH || head.y < 0 || head.y >= GRID_HEIGHT {
+        next_state.set(GameState::GameOver);
+        return;
+    }
+
+    // self collision (ignore last tail segment because it moves)
+    if body.positions.len() > 2 && body.positions[1..body.positions.len() - 1].contains(&head) {
+        next_state.set(GameState::GameOver);
     }
 }
 
 fn handle_fruit_eaten(
     mut events: EventReader<FruitEatenEvent>,
     mut query: Query<(&mut Fruit, &mut Transform)>,
+    snake: Res<SnakeBody>,
     mut score: ResMut<Score>,
 ) {
     use rand::Rng;
@@ -194,7 +257,14 @@ fn handle_fruit_eaten(
         score.0 += 1;
 
         for (mut fruit, mut transform) in &mut query {
-            let new_pos = IVec2::new(rng.gen_range(0..GRID_WIDTH), rng.gen_range(0..GRID_HEIGHT));
+            let mut new_pos;
+
+            loop {
+                new_pos = IVec2::new(rng.gen_range(0..GRID_WIDTH), rng.gen_range(0..GRID_HEIGHT));
+                if !snake.positions.contains(&new_pos) {
+                    break;
+                }
+            }
 
             fruit.position = new_pos;
             transform.translation = grid_to_world(new_pos);
@@ -207,5 +277,59 @@ fn update_score_text(score: Res<Score>, mut query: Query<&mut Text2d, With<Score
         for mut text in &mut query {
             text.0 = format!("Score: {}", score.0);
         }
+    }
+}
+
+fn grow_snake(
+    mut commands: Commands,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
+    mut body: ResMut<SnakeBody>,
+    mut events: EventReader<FruitEatenEvent>,
+    mut segments: Query<(Entity, &mut SnakeSegment)>,
+) {
+    for _ in events.read() {
+        // add new tail position
+        let tail_pos = *body.positions.last().unwrap();
+        body.positions.push(tail_pos);
+
+        // spawn new entity
+        commands.spawn((
+            Mesh2d(meshes.add(Rectangle::new(CELL_SIZE, CELL_SIZE))),
+            MeshMaterial2d(materials.add(Color::srgb_u8(140, 180, 15))),
+            Transform::from_translation(grid_to_world(tail_pos)),
+            SnakeSegment,
+        ));
+    }
+}
+
+fn cleanup_entities(
+    mut commands: Commands,
+    segments: Query<Entity, With<SnakeSegment>>,
+    mut snake: ResMut<SnakeBody>,
+    fruits: Query<Entity, With<Fruit>>,
+) {
+    for e in &segments {
+        commands.entity(e).despawn();
+    }
+    snake.positions.clear();
+
+    for e in &fruits {
+        commands.entity(e).despawn();
+    }
+}
+
+fn show_start_text(mut commands: Commands) {
+    commands.spawn((
+        Text2d::new("Press Space to Start"),
+        TextLayout::new(JustifyText::Center, LineBreak::WordBoundary),
+        Transform::from_xyz(0.0, 0.0, 1.0),
+        StartText,
+    ));
+}
+
+fn hide_start_text(mut commands: Commands, query: Query<Entity, With<StartText>>) {
+    for e in &query {
+        commands.entity(e).despawn();
     }
 }
