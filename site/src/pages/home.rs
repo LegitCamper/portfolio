@@ -145,11 +145,16 @@ pub fn Arcade() -> impl IntoView {
         </style>
         <div class="container" id="arcade">
             <h1>"Arcade"</h1>
-                <div>
-                    <canvas id="snake_canvas" width="1280" height="720"></canvas>
-                    <script type="module" src="wasm/snake.js"></script>
-                </div>
             <div class="box">
+                <div>
+                    <canvas id="snake-canvas" width="1280" height="720"></canvas>
+                    <script type="module">
+                        r#"
+                        import init from './snake.js'
+                        init()
+                        "#
+                    </script>
+                    </div>
             </div>
         </div>
     }
