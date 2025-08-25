@@ -25,6 +25,7 @@ pub fn Home() -> impl IntoView {
             <NavBar></NavBar>
             <Intro></Intro>
             <AboutMe></AboutMe>
+            <Arcade></Arcade>
             <Projects></Projects>
 
         </ErrorBoundary>
@@ -133,6 +134,28 @@ pub fn AboutMe() -> impl IntoView {
 }
 
 #[component]
+pub fn Arcade() -> impl IntoView {
+    view! {
+        <style>
+            "#arcade {
+                  color: #cad3f5;
+                  vertical-align: middle;
+                  flex-wrap: wrap;
+            }"
+        </style>
+        <div class="container" id="arcade">
+            <h1>"Arcade"</h1>
+                <div>
+                    <canvas id="snake_canvas" width="1280" height="720"></canvas>
+                    <script type="module" src="wasm/snake.js"></script>
+                </div>
+            <div class="box">
+            </div>
+        </div>
+    }
+}
+
+#[component]
 pub fn Projects() -> impl IntoView {
     view! {
         <style>
@@ -208,6 +231,7 @@ pub fn NavBar() -> impl IntoView {
         <div class="navbar">
             <a href="#intro">Home</a>
             <a href="#about_me">About Me</a>
+            <a href="#arcade">Arcade</a>
             <a href="#projects">Projects</a>
         </div>
     }

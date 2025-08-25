@@ -7,7 +7,14 @@ const CELL_SIZE: f32 = 20.; // pixels per cell
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins)
+        .add_plugins(DefaultPlugins.set(WindowPlugin {
+            primary_window: Some(Window {
+                canvas: Some("#snake-canvas".into()),
+                // ... any other window properties ...
+                ..default()
+            }),
+            ..default()
+        }))
         .init_state::<GameState>()
         .insert_resource(Score(0))
         .insert_resource(SnakeBody {
@@ -152,16 +159,24 @@ fn grid_to_world(pos: IVec2) -> Vec3 {
 }
 
 fn handle_input(keyboard_input: Res<ButtonInput<KeyCode>>, mut direction: ResMut<SnakeDirection>) {
-    if keyboard_input.just_pressed(KeyCode::ArrowUp) && direction.0 != Direction::Down {
+    if keyboard_input.just_pressed(KeyCode::ArrowUp)
+        || keyboard_input.just_pressed(KeyCode::KeyW) && direction.0 != Direction::Down
+    {
         direction.0 = Direction::Up;
     }
-    if keyboard_input.just_pressed(KeyCode::ArrowDown) && direction.0 != Direction::Up {
+    if keyboard_input.just_pressed(KeyCode::ArrowDown)
+        || keyboard_input.just_pressed(KeyCode::KeyS) && direction.0 != Direction::Up
+    {
         direction.0 = Direction::Down;
     }
-    if keyboard_input.just_pressed(KeyCode::ArrowLeft) && direction.0 != Direction::Right {
+    if keyboard_input.just_pressed(KeyCode::ArrowLeft)
+        || keyboard_input.just_pressed(KeyCode::KeyA) && direction.0 != Direction::Right
+    {
         direction.0 = Direction::Left;
     }
-    if keyboard_input.just_pressed(KeyCode::ArrowRight) && direction.0 != Direction::Left {
+    if keyboard_input.just_pressed(KeyCode::ArrowRight)
+        || keyboard_input.just_pressed(KeyCode::KeyD) && direction.0 != Direction::Left
+    {
         direction.0 = Direction::Right;
     }
 }
