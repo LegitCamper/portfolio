@@ -78,12 +78,11 @@ pub fn Home() -> impl IntoView {
                 }
             }>
 
-
-
                 <NavBar></NavBar>
                 <Intro></Intro>
                 <AboutMe></AboutMe>
                 <Skills></Skills>
+                <Arcade></Arcade>
                 <Projects></Projects>
 
             </ErrorBoundary>
@@ -215,6 +214,28 @@ pub fn Skills() -> impl IntoView {
 }
 
 #[component]
+pub fn Arcade() -> impl IntoView {
+    view! {
+        <div class="section" id="arcade">
+            <div class="section_box">
+                <h1>"Arcade"</h1>
+                <div class="arcade">
+                    <div>
+                        <canvas id="snake-canvas" width="1280" height="720"></canvas>
+                        <script type="module">
+                            r#"
+                            import init from './snake.js'
+                            init()
+                            "#
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+#[component]
 pub fn Projects() -> impl IntoView {
     let styles = style! {
         .project-card {
@@ -332,6 +353,7 @@ pub fn NavBar() -> impl IntoView {
             <a href="#intro">Home</a>
             <a href="#about_me">About Me</a>
             <a href="#skills">Skills</a>
+            <a href="#arcade">Arcade</a>
             <a href="#projects">Projects</a>
         </div>
     }
