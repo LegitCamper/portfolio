@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["games/snake","site"]
+members = ["games/snake", "site"]
 
 [profile.dev.package."*"]
 opt-level = 3

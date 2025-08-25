@@ -1,18 +1,18 @@
+pub mod pages;
+
 use leptos::prelude::*;
 use leptos_meta::*;
-use leptos_meta::{provide_meta_context, MetaTags, Stylesheet, Title};
+use leptos_meta::{provide_meta_context, MetaTags, Title};
 use leptos_router::{
     components::{Redirect, Route, Router, Routes},
     StaticSegment,
 };
 
-pub mod pages;
 // Top-Level pages
-use pages::home::Home;
-use pages::not_found::NotFound;
+use pages::{home::Home, not_found::NotFound};
 
 pub fn shell(options: LeptosOptions) -> impl IntoView {
-    view! {
+    view! { styles,
         <!DOCTYPE html>
         <html lang="en">
             <head>
@@ -21,9 +21,45 @@ pub fn shell(options: LeptosOptions) -> impl IntoView {
                 <AutoReload options=options.clone() />
                 <HydrationScripts options />
                 <MetaTags />
+
+                <link
+                    rel="stylesheet"
+                    href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css"
+                />
+
+                <link rel="preconnect" href="https://fonts.googleapis.com" />
+                <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+                <link
+                    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap"
+                    rel="stylesheet"
+                />
+
+                // github code graph
+                <link rel="stylesheet" href="https://ghcg.lyova24.ru/static/gh.css" />
+
+                <Style>
+                    "body {
+                        background-color: #24273a;
+                        font-family: 'JetBrains Mono', monospace;
+                        text-align: center;
+                    }
+                    h1 {
+                        font-size: 2.5rem;
+                    }
+                    
+                    h2 {
+                        font-size: 2rem;
+                    }
+                    
+                    p {
+                        line-height: 1.6;
+                    }"
+                </Style>
+
             </head>
             <body>
                 <App />
+                <script src="https://ghcg.lyova24.ru/static/gh.js"></script>
             </body>
         </html>
     }
@@ -49,11 +85,6 @@ pub fn App() -> impl IntoView {
     provide_meta_context();
 
     view! {
-        // injects a stylesheet into the document <head>
-        // id=leptos means cargo-leptos will hot-reload this stylesheet
-        <Stylesheet id="leptos" href="/pkg/portfolio.css" />
-
-        // <Html lang="en" dir="ltr" attr:data-theme="dark" />
         <Title text="Portfolio | Sawyer Bristol" />
 
         <Router>
@@ -101,11 +132,4 @@ pub fn App() -> impl IntoView {
             </Routes>
         </Router>
     }
-}
-
-#[cfg(feature = "hydrate")]
-#[wasm_bindgen::prelude::wasm_bindgen]
-pub fn hydrate() {
-    console_error_panic_hook::set_once();
-    leptos::mount::hydrate_body(App);
 }
