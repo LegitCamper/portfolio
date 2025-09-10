@@ -1,4 +1,4 @@
-FROM pandoc/typst as resume-builder
+FROM pandoc/typst AS resume-builder
 
 WORKDIR /work
 COPY resume .
@@ -7,7 +7,7 @@ RUN typst compile resume.typ --input admin=true --input developer=true
 
 # --------------------
 
-FROM rust:alpine as arcade-builder
+FROM rust:alpine AS arcade-builder
 
 RUN apk add curl gcc libc-dev pkgconf libx11-dev alsa-lib-dev eudev-dev
 
@@ -25,7 +25,7 @@ RUN ./build-games.sh snake
 
 # --------------------
 
-FROM rustlang/rust:nightly-alpine as site-builder
+FROM rustlang/rust:nightly-alpine AS site-builder
 
 RUN apk add curl make musl-dev  
 
@@ -42,7 +42,7 @@ RUN cargo +nightly leptos build --release -vv
 
 # --------------------
 
-FROM alpine:latest as runner
+FROM alpine:latest AS runner
 
 WORKDIR /app
 COPY --from=site-builder /work/target/release/portfolio /app/
