@@ -4,3 +4,4 @@ site/public/assets/resume.pdf
 out
 *.wasm
 *.js
+public/assets/resume.pdf

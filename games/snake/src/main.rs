@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy::window::WindowFocused;
 use rand::Rng;
 
 const GRID_WIDTH: i32 = 20;
@@ -17,6 +18,7 @@ fn main() {
         }))
         .init_state::<GameState>()
         .insert_resource(Score(0))
+        .insert_resource(FocusState { focused: false })
         .insert_resource(SnakeBody {
             positions: vec![IVec2::new(10, 10)],
         })
@@ -26,6 +28,7 @@ fn main() {
         .add_systems(
             Update,
             (
+                pause_resume_on_focus_change,
                 start.run_if(in_state(GameState::GameOver)),
                 handle_input.run_if(in_state(GameState::Running)),
                 move_snake.run_if(in_state(GameState::Running)),
@@ -37,9 +40,13 @@ fn main() {
             )
                 .chain(),
         )
-        .add_systems(OnEnter(GameState::GameOver), show_start_text)
+        .add_systems(
+            OnEnter(GameState::GameOver),
+            (show_start_text, cleanup_entities),
+        )
         .add_systems(OnEnter(GameState::Running), hide_start_text)
-        .add_systems(OnEnter(GameState::GameOver), cleanup_entities)
+        .add_systems(OnEnter(GameState::Paused), pause)
+        .add_systems(OnExit(GameState::Paused), unpause)
         .run();
 }
 
@@ -48,6 +55,7 @@ enum GameState {
     Running,
     #[default]
     GameOver,
+    Paused,
 }
 
 #[derive(Resource)]
@@ -85,6 +93,11 @@ struct ScoreText;
 
 #[derive(Component)]
 struct StartText;
+
+#[derive(Resource, Default)]
+struct FocusState {
+    focused: bool,
+}
 
 fn setup(
     mut commands: Commands,
@@ -347,4 +360,32 @@ fn hide_start_text(mut commands: Commands, query: Query<Entity, With<StartText>>
     for e in &query {
         commands.entity(e).despawn();
     }
+}
+
+fn pause_resume_on_focus_change(
+    mut ev_focus: EventReader<WindowFocused>,
+    mut next_state: ResMut<NextState<GameState>>,
+    mut focus_state: ResMut<FocusState>,
+) {
+    for e in ev_focus.read() {
+        if e.focused != focus_state.focused {
+            focus_state.focused = e.focused;
+
+            if e.focused {
+                next_state.set(GameState::Running);
+            } else {
+                next_state.set(GameState::Paused);
+            }
+        }
+    }
+}
+
+fn pause(mut q: Query<&mut Text>) {
+    // Add "Paused" overlay text, or dim UI
+    info!("Game Paused");
+}
+
+fn unpause(mut q: Query<&mut Text>) {
+    // Remove overlay / resume animations
+    info!("Game Resumed");
 }

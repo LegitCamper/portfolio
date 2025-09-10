@@ -221,7 +221,7 @@ pub fn Arcade() -> impl IntoView {
                 <h1>"Arcade"</h1>
                 <div class="arcade">
                     <div>
-                        <canvas id="snake-canvas" width="1280" height="720"></canvas>
+                        <canvas id="snake-canvas"></canvas>
                         <script type="module">
                             r#"
                             import init from './snake.js'

@@ -12,7 +12,7 @@ use leptos_router::{
 use pages::{home::Home, not_found::NotFound};
 
 pub fn shell(options: LeptosOptions) -> impl IntoView {
-    view! { styles,
+    view! {
         <!DOCTYPE html>
         <html lang="en">
             <head>
