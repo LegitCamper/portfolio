@@ -3,6 +3,15 @@ name = "portfolio"
 version = "0.1.0"
 edition = "2021"
 
+# Defines a size-optimized profile for the WASM bundle in release mode
+[profile.wasm-release]
+strip = "debuginfo"
+inherits = "release"
+opt-level = 's'
+lto = true
+codegen-units = 1
+panic = "abort"
+
 [lib]
 crate-type = ["cdylib", "rlib"]
 
@@ -19,7 +28,7 @@ tokio = { version = "1", features = [
 ], optional = true }
 tower = { version = "0.4", optional = true }
 tower-http = { version = "0.5", features = ["fs"], optional = true }
-wasm-bindgen = "=0.2.100"
+wasm-bindgen = "=0.2.101"
 thiserror = "1"
 tracing = { version = "0.1", optional = true }
 http = "1"
@@ -51,8 +60,6 @@ assets-dir = "public"
 site-addr = "127.0.0.1:8000"
 reload-port = 8001
 browserquery = "defaults"
-env = "PROD"
-# env = "DEV"
 bin-features = ["ssr"]
 bin-default-features = false
 lib-features = ["hydrate"]
