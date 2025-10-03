@@ -224,7 +224,7 @@ pub fn Arcade() -> impl IntoView {
                         <canvas id="snake-canvas"></canvas>
                         <script type="module">
                             r#"
-                            import init from './snake.js'
+                            import init from '/wasm/snake.js'
                             init()
                             "#
                         </script>

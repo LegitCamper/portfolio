@@ -53,7 +53,7 @@ COPY --from=arcade-builder /work/games/wasm/* /app/site/public/wasm/
 
 ENV RUST_LOG="info"
 ENV LEPTOS_SITE_ROOT="./site"
-ENV LEPTOS_SITE_ADDR="127.0.0.1:8000"
+ENV LEPTOS_SITE_ADDR="0.0.0.0:8000"
 EXPOSE 8000
 
 CMD ["/app/portfolio"]

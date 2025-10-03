@@ -19,6 +19,7 @@ async fn main() {
 
     let app = Router::new()
         .nest_service("/static", ServeDir::new("static"))
+        .nest_service("/wasm", ServeDir::new("site/public/wasm"))
         .leptos_routes(&leptos_options, routes, {
             let leptos_options = leptos_options.clone();
             move || shell(leptos_options.clone())
