@@ -7,15 +7,15 @@ RUN typst compile resume.typ --input admin=true --input developer=true
 
 # --------------------
 
-FROM rust:alpine AS arcade-builder
+FROM rust:1.90.0-alpine AS arcade-builder
 
 RUN apk add curl gcc libc-dev pkgconf libx11-dev alsa-lib-dev eudev-dev
 
 RUN curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | sh 
 
-RUN rustup +stable target add wasm32-unknown-unknown
+RUN rustup target add wasm32-unknown-unknown
 
-RUN cargo binstall wasm-bindgen-cli --version 0.2.101
+RUN cargo binstall wasm-bindgen-cli --version 0.2.100
 
 WORKDIR /work
 COPY games games
@@ -25,7 +25,7 @@ RUN ./build-games.sh snake
 
 # --------------------
 
-FROM rustlang/rust:nightly-alpine AS site-builder
+FROM rust:1.90.0-alpine AS site-builder
 
 RUN apk add curl make musl-dev  
 
@@ -36,9 +36,9 @@ COPY site .
 
 RUN rustup target add wasm32-unknown-unknown
 
-RUN cargo binstall cargo-leptos
+RUN cargo binstall cargo-leptos --version 0.2.44
 
-RUN cargo +nightly leptos build --release -vv
+RUN cargo leptos build --release -vv
 
 # --------------------
 
