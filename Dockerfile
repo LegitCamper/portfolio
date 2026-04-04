@@ -15,7 +15,7 @@ RUN curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/ca
 
 RUN rustup target add wasm32-unknown-unknown
 
-RUN cargo binstall wasm-bindgen-cli --version 0.2.100
+RUN cargo binstall wasm-bindgen-cli --version 0.2.117
 
 WORKDIR /work
 COPY games games
@@ -36,7 +36,7 @@ COPY site .
 
 RUN rustup target add wasm32-unknown-unknown
 
-RUN cargo binstall cargo-leptos --version 0.2.44
+RUN cargo binstall cargo-leptos --version 0.3.5
 
 RUN cargo leptos build --release -vv
 
@@ -45,15 +45,10 @@ RUN cargo leptos build --release -vv
 FROM alpine:latest AS runner
 
 WORKDIR /app
-COPY --from=site-builder /work/target/release/portfolio /app/
+COPY --from=site-builder /work/target/release/site /app/
 COPY --from=site-builder /work/target/site /app/site
 COPY --from=site-builder /work/Cargo.toml /app/
 COPY --from=resume-builder /work/resume.pdf /app/site/public/assets/resume.pdf
-COPY --from=arcade-builder /work/games/wasm/* /app/site/public/wasm/
+COPY --from=arcade-builder /work/site/public/arcade/* /app/site/public/arcade/
 
-ENV RUST_LOG="info"
-ENV LEPTOS_SITE_ROOT="./site"
-ENV LEPTOS_SITE_ADDR="0.0.0.0:8000"
-EXPOSE 8000
-
-CMD ["/app/portfolio"]
+CMD ["/app/site"]

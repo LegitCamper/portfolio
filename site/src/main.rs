@@ -1,73 +1,42 @@
-#[cfg(not(feature = "ssr"))]
-pub fn main() {}
+use rocket::fs::{FileServer, Options};
 
-#[cfg(feature = "ssr")]
-#[tokio::main]
-async fn main() {
-    use axum::Router;
-    use leptos::logging::log;
-    use leptos::prelude::*;
-    use leptos_axum::{generate_route_list, LeptosRoutes};
-    use portfolio::*;
-    use tower_http::services::ServeDir;
+#[macro_use]
+extern crate rocket;
 
-    let conf = get_configuration(None).unwrap();
-    let addr = conf.leptos_options.site_addr;
-    let leptos_options = conf.leptos_options;
-    // Generate the list of routes in your Leptos App
-    let routes = generate_route_list(App);
+#[rocket::main]
+async fn main() -> Result<(), rocket::Error> {
+    let _rocket = rocket::build()
+        .mount(
+            "/",
+            routes![home, cs50x, linuxplus, secplus, conf, oss, itfplus, ccna],
+        )
+        .mount("/", FileServer::new("site/public/", Options::None))
+        .ignite()
+        .await?
+        .launch()
+        .await?;
 
-    let app = Router::new()
-        .nest_service("/static", ServeDir::new("static"))
-        .nest_service("/wasm", ServeDir::new("site/public/wasm"))
-        .leptos_routes(&leptos_options, routes, {
-            let leptos_options = leptos_options.clone();
-            move || shell(leptos_options.clone())
-        })
-        .fallback(leptos_axum::file_and_error_handler(shell))
-        .with_state(leptos_options);
-
-    // run our app with hyper
-    // `axum::Server` is a re-export of `hyper::Server`
-    log!("listening on http://{}", &addr);
-    let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
-    axum::serve(listener, app.into_make_service())
-        .with_graceful_shutdown(shutdown_signal())
-        .await
-        .unwrap();
+    Ok(())
 }
 
-use tokio::signal;
-#[cfg(unix)]
-use tokio::signal::unix::{signal, SignalKind};
-
-async fn shutdown_signal() {
-    let ctrl_c = async {
-        tokio::signal::ctrl_c()
-            .await
-            .expect("failed to install Ctrl+C handler");
+macro_rules! redirect_route {
+    ($name:ident, $path:literal, $target:literal) => {
+        #[get($path)]
+        fn $name() -> rocket::response::Redirect {
+            rocket::response::Redirect::to($target)
+        }
     };
-
-    #[cfg(unix)]
-    let terminate = async {
-        signal(SignalKind::terminate())
-            .expect("failed to install signal handler")
-            .recv()
-            .await;
-    };
-
-    #[cfg(not(unix))]
-    let terminate = std::future::pending::<()>();
-
-    tokio::select! {
-        _ = ctrl_c => {},
-        _ = terminate => {},
-    }
 }
 
-#[cfg(not(feature = "ssr"))]
-pub fn main() {
-    // no client-side main function
-    // unless we want this to work with e.g., Trunk for pure client-side testing
-    // see lib.rs for hydration function instead
-}
+redirect_route!(home, "/", "/home.html");
+redirect_route!(cs50x, "/cs50x", "/assets/CS50x.pdf");
+redirect_route!(linuxplus, "/linuxplus", "/assets/LinuxPlus.pdf");
+redirect_route!(secplus, "/secplus", "/assets/SecurityPlus.pdf");
+redirect_route!(conf, "/conf", "/assets/AzureConfig.pdf");
+redirect_route!(oss, "/oss", "/assets/AzureOss.pdf");
+redirect_route!(itfplus, "/itfplus", "/assets/ITFPlus.pdf");
+redirect_route!(
+    ccna,
+    "/ccna",
+    "https://www.credly.com/earner/earned/badge/5fb6df62-6a0c-4726-ba18-f53ac658848e"
+);

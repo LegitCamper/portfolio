@@ -1,6 +1,5 @@
 use bevy::prelude::*;
-use bevy::window::WindowFocused;
-use rand::Rng;
+use bevy::window::PrimaryWindow;
 
 const GRID_WIDTH: i32 = 20;
 const GRID_HEIGHT: i32 = 20;
@@ -18,7 +17,6 @@ fn main() {
         }))
         .init_state::<GameState>()
         .insert_resource(Score(0))
-        .insert_resource(FocusState { focused: false })
         .insert_resource(SnakeBody {
             positions: vec![IVec2::new(10, 10)],
         })
@@ -28,7 +26,6 @@ fn main() {
         .add_systems(
             Update,
             (
-                pause_resume_on_focus_change,
                 start.run_if(in_state(GameState::GameOver)),
                 handle_input.run_if(in_state(GameState::Running)),
                 move_snake.run_if(in_state(GameState::Running)),
@@ -45,8 +42,6 @@ fn main() {
             (show_start_text, cleanup_entities),
         )
         .add_systems(OnEnter(GameState::Running), hide_start_text)
-        .add_systems(OnEnter(GameState::Paused), pause)
-        .add_systems(OnExit(GameState::Paused), unpause)
         .run();
 }
 
@@ -55,7 +50,6 @@ enum GameState {
     Running,
     #[default]
     GameOver,
-    Paused,
 }
 
 #[derive(Resource)]
@@ -94,20 +88,11 @@ struct ScoreText;
 #[derive(Component)]
 struct StartText;
 
-#[derive(Resource, Default)]
-struct FocusState {
-    focused: bool,
-}
-
 fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
-    mut asset_server: Res<AssetServer>,
 ) {
-    // snake starts with length 1 at (10, 10)
-    let start_pos = IVec2::new(10, 10);
-
     commands.spawn(Camera2d);
 
     commands.spawn((
@@ -138,7 +123,6 @@ fn start(
     mut next_state: ResMut<NextState<GameState>>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
-    mut asset_server: Res<AssetServer>,
     mut score: ResMut<Score>,
     mut snake_direction: ResMut<SnakeDirection>,
     mut snake: ResMut<SnakeBody>,
@@ -171,7 +155,18 @@ fn grid_to_world(pos: IVec2) -> Vec3 {
     Vec3::new(world_x, world_y, 0.0)
 }
 
-fn handle_input(keyboard_input: Res<ButtonInput<KeyCode>>, mut direction: ResMut<SnakeDirection>) {
+fn handle_input(
+    windows: Query<&Window, With<PrimaryWindow>>,
+    keyboard_input: Res<ButtonInput<KeyCode>>,
+    mut direction: ResMut<SnakeDirection>,
+) {
+    let Ok(window) = windows.single() else {
+        return;
+    };
+
+    if !window.focused {
+        return;
+    }
     if keyboard_input.just_pressed(KeyCode::ArrowUp)
         || keyboard_input.just_pressed(KeyCode::KeyW) && direction.0 != Direction::Down
     {
@@ -195,12 +190,21 @@ fn handle_input(keyboard_input: Res<ButtonInput<KeyCode>>, mut direction: ResMut
 }
 
 fn move_snake(
+    windows: Query<&Window, With<PrimaryWindow>>,
     time: Res<Time>,
     mut body: ResMut<SnakeBody>,
     mut segments: Query<&mut Transform, With<SnakeSegment>>,
     mut timer: Local<Timer>,
     direction: Res<SnakeDirection>,
 ) {
+    let Ok(window) = windows.single() else {
+        return;
+    };
+
+    if !window.focused {
+        return;
+    }
+
     if timer.duration().is_zero() {
         *timer = Timer::from_seconds(0.2, TimerMode::Repeating);
     }
@@ -231,9 +235,12 @@ fn spawn_fruit(
     materials: &mut ResMut<Assets<ColorMaterial>>,
 ) {
     use rand::Rng;
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
 
-    let fruit_pos = IVec2::new(rng.gen_range(0..GRID_WIDTH), rng.gen_range(0..GRID_HEIGHT));
+    let fruit_pos = IVec2::new(
+        rng.random_range(0..GRID_WIDTH),
+        rng.random_range(0..GRID_HEIGHT),
+    );
     commands.spawn((
         Mesh2d(meshes.add(Rectangle::new(CELL_SIZE, CELL_SIZE))),
         MeshMaterial2d(materials.add(Color::srgb_u8(100, 100, 10))),
@@ -252,7 +259,7 @@ fn check_fruit_collision(
     let head = body.positions[0];
     for fruit in &fruits {
         if fruit.position == head {
-            events.send(FruitEatenEvent); // only sends event
+            events.write(FruitEatenEvent); // only sends event
         }
     }
 }
@@ -279,7 +286,7 @@ fn handle_fruit_eaten(
     mut score: ResMut<Score>,
 ) {
     use rand::Rng;
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
 
     for _ in events.read() {
         score.0 += 1;
@@ -288,7 +295,10 @@ fn handle_fruit_eaten(
             let mut new_pos;
 
             loop {
-                new_pos = IVec2::new(rng.gen_range(0..GRID_WIDTH), rng.gen_range(0..GRID_HEIGHT));
+                new_pos = IVec2::new(
+                    rng.random_range(0..GRID_WIDTH),
+                    rng.random_range(0..GRID_HEIGHT),
+                );
                 if !snake.positions.contains(&new_pos) {
                     break;
                 }
@@ -314,7 +324,6 @@ fn grow_snake(
     mut materials: ResMut<Assets<ColorMaterial>>,
     mut body: ResMut<SnakeBody>,
     mut events: EventReader<FruitEatenEvent>,
-    mut segments: Query<(Entity, &mut SnakeSegment)>,
 ) {
     for _ in events.read() {
         // add new tail position
@@ -360,32 +369,4 @@ fn hide_start_text(mut commands: Commands, query: Query<Entity, With<StartText>>
     for e in &query {
         commands.entity(e).despawn();
     }
-}
-
-fn pause_resume_on_focus_change(
-    mut ev_focus: EventReader<WindowFocused>,
-    mut next_state: ResMut<NextState<GameState>>,
-    mut focus_state: ResMut<FocusState>,
-) {
-    for e in ev_focus.read() {
-        if e.focused != focus_state.focused {
-            focus_state.focused = e.focused;
-
-            if e.focused {
-                next_state.set(GameState::Running);
-            } else {
-                next_state.set(GameState::Paused);
-            }
-        }
-    }
-}
-
-fn pause(mut q: Query<&mut Text>) {
-    // Add "Paused" overlay text, or dim UI
-    info!("Game Paused");
-}
-
-fn unpause(mut q: Query<&mut Text>) {
-    // Remove overlay / resume animations
-    info!("Game Resumed");
 }
