@@ -3,6 +3,12 @@ use rocket::fs::{FileServer, Options};
 #[macro_use]
 extern crate rocket;
 
+#[cfg(debug_assertions)]
+const PUBLIC_DIR: &str = "site/public";
+
+#[cfg(not(debug_assertions))]
+const PUBLIC_DIR: &str = "public";
+
 #[rocket::main]
 async fn main() -> Result<(), rocket::Error> {
     let _rocket = rocket::build()
@@ -10,7 +16,7 @@ async fn main() -> Result<(), rocket::Error> {
             "/",
             routes![home, cs50x, linuxplus, secplus, conf, oss, itfplus, ccna],
         )
-        .mount("/", FileServer::new("site/public/", Options::None))
+        .mount("/", FileServer::new(PUBLIC_DIR, Options::None))
         .ignite()
         .await?
         .launch()

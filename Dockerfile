@@ -9,46 +9,47 @@ RUN typst compile resume.typ --input admin=true --input developer=true
 
 FROM rust:1.90.0-alpine AS arcade-builder
 
-RUN apk add curl gcc libc-dev pkgconf libx11-dev alsa-lib-dev eudev-dev
-
-RUN curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | sh 
+RUN apk add --no-cache curl gcc \
+  libc-dev pkgconf \
+  libx11-dev alsa-lib-dev \
+  eudev-dev bash
 
 RUN rustup target add wasm32-unknown-unknown
 
-RUN cargo binstall wasm-bindgen-cli --version 0.2.117
+RUN cargo install wasm-bindgen-cli --version 0.2.117
 
 WORKDIR /work
-COPY games games
-COPY build-games.sh build-games.sh
 
+COPY build-games.sh .
+COPY Cargo.toml .
+COPY site ./site
+COPY games ./games
+
+RUN mkdir -p /work/site/public/arcade
 RUN ./build-games.sh snake
 
 # --------------------
 
 FROM rust:1.90.0-alpine AS site-builder
 
-RUN apk add curl make musl-dev  
-
-RUN curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | sh 
+RUN apk add --no-cache build-base
 
 WORKDIR /work
 COPY site .
 
-RUN rustup target add wasm32-unknown-unknown
-
-RUN cargo binstall cargo-leptos --version 0.3.5
-
-RUN cargo leptos build --release -vv
+RUN cargo build --release
 
 # --------------------
 
 FROM alpine:latest AS runner
 
 WORKDIR /app
-COPY --from=site-builder /work/target/release/site /app/
-COPY --from=site-builder /work/target/site /app/site
-COPY --from=site-builder /work/Cargo.toml /app/
-COPY --from=resume-builder /work/resume.pdf /app/site/public/assets/resume.pdf
-COPY --from=arcade-builder /work/site/public/arcade/* /app/site/public/arcade/
+COPY --from=site-builder /work/target/release/site /app/site
+COPY --from=site-builder /work/public /app/public
+COPY --from=resume-builder /work/resume.pdf /app/public/assets/resume.pdf
+COPY --from=arcade-builder /work/site/public/arcade/* /app/public/arcade/
+
+ENV ROCKET_ADDRESS=0.0.0.0
+ENV ROCKET_PORT=8000
 
 CMD ["/app/site"]
