@@ -12,7 +12,7 @@ FROM rust:1.90.0-alpine AS arcade-builder
 RUN apk add --no-cache curl gcc \
   libc-dev pkgconf \
   libx11-dev alsa-lib-dev \
-  eudev-dev bash
+  eudev-dev binaryen bash
 
 RUN rustup target add wasm32-unknown-unknown
 

@@ -19,7 +19,10 @@ for var in "$@"; do
             --target wasm32-unknown-unknown \
             --profile wasm-release
 
-        cp "target/wasm32-unknown-unknown/wasm-release/$var.wasm" \
+        wasm-opt -Oz -o target/wasm32-unknown-unknown/wasm-release/$var-min.wasm \
+            target/wasm32-unknown-unknown/wasm-release/$var.wasm
+
+        cp "target/wasm32-unknown-unknown/wasm-release/$var-min.wasm" \
             "$WASM_OUT_DIR/$var.wasm"
 
         wasm-bindgen \
