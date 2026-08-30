@@ -1,37 +1,113 @@
-body {
-  font-family: sans-serif;
-  text-align: center;
-  background-color: #24273a;
-  margin: 0;
-  padding: 0;
+/* ---------------------------------------------------------------
+   Design tokens (Catppuccin Macchiato, used consistently throughout)
+   --------------------------------------------------------------- */
+:root {
+  --crust: #181926;
+  --mantle: #1e2030;
+  --base: #24273a;
+  --surface0: #363a4f;
+  --surface1: #494d64;
+  --surface2: #5b6078;
+
+  --text: #cad3f5;
+  --subtext1: #b8c0e0;
+  --subtext0: #a5adcb;
+
+  --accent: #8aadf4;
+  --accent-strong: #b7bdf8;
+  --accent-soft: rgba(138, 173, 244, 0.16);
+
+  --radius-sm: 10px;
+  --radius-md: 18px;
+  --radius-lg: 28px;
+
+  --space-1: 0.5rem;
+  --space-2: 1rem;
+  --space-3: 1.5rem;
+  --space-4: 2.5rem;
+
+  --nav-h: 56px;
+  --shadow: 0 12px 30px -12px rgba(0, 0, 0, 0.55);
+
+  --font: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font);
+  line-height: 1.65;
+  text-align: center;
+  background-color: var(--base);
+  color: var(--text);
+  margin: 0;
+  padding-top: var(--nav-h);
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--text);
+}
+
+a {
+  color: var(--accent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ---------------------------------------------------------------
+   Navbar
+   --------------------------------------------------------------- */
 .navbar {
-  overflow: hidden;
-  background-color: #181926;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--crust);
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   width: 100%;
+  min-height: var(--nav-h);
   margin: 0;
   padding: 0;
   z-index: 1000;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .navbar a {
-  float: left;
   display: block;
-  color: #cad3f5;
+  color: var(--subtext1);
   text-align: center;
-  padding: 14px 16px;
+  padding: 14px 18px;
   text-decoration: none;
+  font-size: 0.95rem;
+  transition: color 150ms ease, background-color 150ms ease;
 }
 
 .navbar a:hover {
-  background: #939ab7;
+  color: var(--text);
+  background: var(--surface0);
 }
 
+.navbar a.arcade-hidden {
+  display: none;
+}
+
+/* ---------------------------------------------------------------
+   Layout / sections
+   --------------------------------------------------------------- */
 .site-wrapper {
   max-width: 1400px;
   margin: 0 auto;
@@ -39,20 +115,20 @@ body {
 }
 
 .section {
-  margin-bottom: 2rem;
-  padding-top: 2rem;
+  margin: 0;
+  padding: var(--space-4) var(--space-2);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  min-height: 25vh;
-  color: #cad3f5;
+  color: var(--text);
   flex-wrap: wrap;
+  scroll-margin-top: var(--nav-h);
 }
 
-.section:first-of-type {
-  margin-top: 100px;
+.section.arcade-hidden {
+  display: none;
 }
 
 .section img {
@@ -63,7 +139,12 @@ body {
 }
 
 .section a {
-  color: #3489ee;
+  color: var(--accent);
+  transition: color 150ms ease;
+}
+
+.section a:hover {
+  color: var(--accent-strong);
 }
 
 .section p {
@@ -78,16 +159,25 @@ body {
 .section_box,
 .project-card,
 .box {
-  background: #494d64;
-  border-radius: 30px;
+  background: var(--surface0);
+  border: 1px solid rgba(202, 211, 245, 0.06);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
   width: min(92%, 1150px);
-  margin: 25px auto;
-  padding: 24px;
+  margin: var(--space-3) auto;
+  padding: 1.25rem 1.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
-  box-sizing: border-box;
+  gap: 0.6rem;
+}
+
+/* project cards live inside a .section_box, which already provides
+   spacing via its own gap — drop the redundant outer margin so the
+   gaps between cards don't stack on top of it */
+.section_box .project-card {
+  margin: 0;
+  padding: 1rem 1.5rem;
 }
 
 .section_box p,
@@ -95,6 +185,58 @@ body {
 .box p {
   width: 100%;
   max-width: 1000px;
+  color: var(--subtext1);
+}
+
+.section_box h1 {
+  position: relative;
+  padding-bottom: var(--space-1);
+  margin-bottom: 0.25rem;
+}
+
+.section_box h1::after {
+  content: "";
+  display: block;
+  width: 48px;
+  height: 3px;
+  margin: 0.6rem auto 0;
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+/* ---------------------------------------------------------------
+   Typography
+   --------------------------------------------------------------- */
+h1 {
+  font-size: clamp(1.6rem, 1.3rem + 1.2vw, 2.25rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0 0 0.5rem;
+}
+
+h3 {
+  font-weight: 400;
+  color: var(--subtext0);
+  font-size: clamp(1rem, 0.9rem + 0.4vw, 1.15rem);
+  margin: 0 0 1rem;
+}
+
+/* ---------------------------------------------------------------
+   Intro / hero
+   --------------------------------------------------------------- */
+#intro {
+  padding-top: calc(var(--space-4) + 1rem);
+}
+
+#intro img {
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(202, 211, 245, 0.08);
+}
+
+#intro h1 {
+  font-size: clamp(2rem, 1.6rem + 2vw, 3rem);
+  margin-top: var(--space-3);
 }
 
 .socials {
@@ -102,110 +244,169 @@ body {
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  gap: 1rem;
-  margin-top: 1rem;
+  gap: 0.75rem;
+  margin-top: var(--space-2);
 }
 
 .socials a {
-  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  min-width: 44px;
+  padding: 0 14px;
+  background: var(--surface0);
+  border-radius: 999px;
+  color: var(--text);
   text-decoration: none;
+  font-size: 20px;
+  transition: transform 150ms ease, background-color 150ms ease, box-shadow 150ms ease;
+}
+
+.socials a:hover {
+  background: var(--surface1);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
 }
 
 .socials a img {
-  height: 30px;
+  height: 20px;
   width: auto;
+  display: block;
 }
 
-.socials a.devicon-linkedin-plain {
-  font-size: 30px;
-  color: white;
-}
-
-#gh {
-  margin: 2rem 0;
-}
-
-.resume_download {
-  background-color: #b7bdf8;
-  border-radius: 30px;
-  color: #181926;
-  padding: 12px 20px;
-  cursor: pointer;
+/* ---------------------------------------------------------------
+   Buttons
+   --------------------------------------------------------------- */
+.btn {
+  display: inline-block;
+  background-color: var(--accent-strong);
+  border-radius: 999px;
+  color: var(--crust);
+  padding: 12px 24px;
+  font-family: var(--font);
+  font-weight: 600;
   font-size: 15px;
+  text-decoration: none;
   border: none;
+  cursor: pointer;
+  transition: transform 150ms ease, box-shadow 150ms ease;
 }
 
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+  color: var(--crust);
+}
+
+/* ---------------------------------------------------------------
+   Skills
+   --------------------------------------------------------------- */
+.skills {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  max-width: 900px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+}
+
+.skills li {
+  padding: 0.85rem 0;
+  border-bottom: 1px solid rgba(202, 211, 245, 0.08);
+  color: var(--subtext1);
+  line-height: 1.5;
+}
+
+.skills li:last-child {
+  border-bottom: none;
+}
+
+.skills strong {
+  display: inline-block;
+  color: var(--accent);
+  min-width: 190px;
+  margin-right: 0.25rem;
+}
+
+/* ---------------------------------------------------------------
+   Arcade
+   --------------------------------------------------------------- */
+.arcade {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.arcade > div {
+  width: min(560px, 100%);
+  aspect-ratio: 1 / 1;
+  background: var(--mantle);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+#snake-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  outline: none;
+}
+
+#snake-canvas:focus-visible {
+  box-shadow: inset 0 0 0 3px var(--accent);
+}
+
+/* ---------------------------------------------------------------
+   Projects
+   --------------------------------------------------------------- */
 .project-card {
-  background: #5a5f7a;
-  border-radius: 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.project-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 40px -14px rgba(0, 0, 0, 0.6);
 }
 
 .project-card a {
-  color: #3489ee;
+  color: var(--accent);
   text-decoration: none;
+  font-weight: 600;
 }
 
 .project-card a:hover {
+  color: var(--accent-strong);
   text-decoration: underline;
 }
 
 .project-card img {
   max-width: 100%;
   height: auto;
-  border-radius: 15px;
+  border-radius: var(--radius-sm);
   margin-bottom: 10px;
 }
 
-.container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  min-height: 25vh;
+/* ---------------------------------------------------------------
+   Footer
+   --------------------------------------------------------------- */
+.site-footer {
+  padding: var(--space-3) var(--space-2) var(--space-4);
+  color: var(--subtext0);
+  font-size: 0.85rem;
 }
 
-.scroll-down {
-  position: absolute;
-  bottom: 2.5rem;
-  left: 0;
-  width: 100%;
-  text-decoration: none;
+.site-footer a {
+  color: var(--subtext1);
 }
 
-.scroll-down a {
-  color: #3489ee;
-}
-
-.mouse {
-  border: 2px solid #3489ee;
-  display: block;
-  height: 1.6rem;
-  width: 1.25rem;
-  margin: 0.75rem auto auto;
-  border-radius: 1rem;
-  position: relative;
-}
-
-.shapes,
-.wheel {
-  position: absolute;
-}
-
-.wheel {
-  background-color: #3289ee;
-  border-radius: 100%;
-  width: 0.25rem;
-  height: 0.25rem;
-  top: 0.5rem;
-  left: 50%;
-  transform: translateX(-50%);
-  animation: ani-mouse 1.5s linear infinite;
-}
-
+/* ---------------------------------------------------------------
+   Responsive
+   --------------------------------------------------------------- */
 @media (max-width: 768px) {
-
   .section_box,
   .project-card,
   .box {
@@ -214,7 +415,24 @@ body {
   }
 
   .navbar a {
-    padding: 12px 10px;
-    font-size: 14px;
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  .skills strong {
+    display: block;
+    min-width: 0;
+    margin-bottom: 0.15rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  * {
+    transition-duration: 0.001ms !important;
+    animation-duration: 0.001ms !important;
   }
 }

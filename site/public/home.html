@@ -1,6 +1,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="Sawyer Bristol - systems programmer specializing in Rust, DevOps, and self-hosted infrastructure.">
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css">
 	<link rel="stylesheet" href="/home.css">
 	<link rel="preconnect" href="https://fonts.googleapis.com">
@@ -34,8 +35,6 @@
 			   href="https://www.linkedin.com/in/sawyerbristol/"
 			></a>
 		</div>
-
-		<div id="gh" data-login="LegitCamper"></div>
 	</div>
 
 	<div class="section" id="about_me">
@@ -50,9 +49,9 @@
 					contribute and solve difficult problems.
 				</p>
 
-				<button class="resume_download" onclick="location.href='assets/resume.pdf'">
+				<a class="btn" href="assets/resume.pdf" download>
 					Download Resume
-				</button>
+				</a>
 			</div>
 		</div>
 	</div>
@@ -151,6 +150,12 @@
 		</div>
 	</div>
 
+	<footer class="site-footer">
+		<p>&copy; 2026 Sawyer Bristol &middot; built with Rust &amp; Rocket &middot;
+			<a href="https://github.com/LegitCamper/portfolio">source</a>
+		</p>
+	</footer>
+
 	<script>
 		function hideArcade() {
 			document.getElementById("arcade")?.remove();
@@ -179,13 +184,33 @@
 			}
 			
 			showArcade();
-			
+
+			const target = location.hash
+				? document.getElementById(location.hash.slice(1))
+				: null;
+			const scrollX = window.scrollX;
+			const scrollY = window.scrollY;
+			const restoreScroll = () => {
+				if (target) {
+					target.scrollIntoView();
+				} else {
+					window.scrollTo(scrollX, scrollY);
+				}
+			};
+
+			// bevy focuses the canvas once its render pipeline is ready, which
+			// can happen well after init() resolves and scrolls it into view —
+			// snap back from that one automatic focus, but don't interfere
+			// with any focus the user causes themselves afterwards
+			document.addEventListener("focusin", restoreScroll, { once: true });
+
 			try {
 				const { default: init } = await import("/arcade/snake.js");
 				await init();
-				
+				restoreScroll();
+
 				const canvas = document.getElementById("snake-canvas");
-				canvas?.focus();
+				canvas?.focus({ preventScroll: true });
 				canvas?.addEventListener("click", () => canvas.focus());
 				} catch (err) {
 					console.error("Failed to load arcade:", err);
