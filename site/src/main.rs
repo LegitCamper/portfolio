@@ -14,7 +14,7 @@ async fn main() -> Result<(), rocket::Error> {
     let _rocket = rocket::build()
         .mount(
             "/",
-            routes![home, cs50x, linuxplus, secplus, conf, oss, itfplus, ccna],
+            routes![health, home, cs50x, linuxplus, secplus, conf, oss, itfplus, ccna],
         )
         .mount("/", FileServer::new(PUBLIC_DIR, Options::None))
         .ignite()
@@ -23,6 +23,11 @@ async fn main() -> Result<(), rocket::Error> {
         .await?;
 
     Ok(())
+}
+
+#[get("/health")]
+fn health() -> &'static str {
+    "ok"
 }
 
 macro_rules! redirect_route {
