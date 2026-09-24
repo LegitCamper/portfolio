@@ -101,13 +101,38 @@
 		<section class="section arcade-hidden" id="arcade" aria-labelledby="arcade-title">
 			<div class="section_box">
 				<h2 id="arcade-title">Arcade</h2>
-				<div class="arcade">
-					<div>
-						<canvas id="snake-canvas" tabindex="0" aria-label="Snake game board"></canvas>
+				<div class="arcade-gallery" id="arcade-gallery">
+					<button class="game-card" data-game="snake" type="button">
+						<h3>🐍 Snake</h3>
+						<p>Eat fruit, grow longer, don't bite yourself.</p>
+						<span class="game-controls">Arrows / WASD</span>
+					</button>
+					<button class="game-card" data-game="pong" type="button">
+						<h3>🏓 Pong</h3>
+						<p>First to 11 against the house paddle.</p>
+						<span class="game-controls">W/S or Up/Down</span>
+					</button>
+					<button class="game-card" data-game="breakout" type="button">
+						<h3>🧱 Breakout</h3>
+						<p>Clear every brick with three lives.</p>
+						<span class="game-controls">Left/Right or A/D</span>
+					</button>
+					<button class="game-card" data-game="tetris" type="button">
+						<h3>🟦 Tetris</h3>
+						<p>Stack the pieces, clear the lines.</p>
+						<span class="game-controls">Arrows</span>
+					</button>
+				</div>
+
+				<div class="arcade-player arcade-hidden" id="arcade-player">
+					<div class="arcade-player-bar">
+						<button class="btn" id="arcade-back" type="button">← All games</button>
+						<span id="arcade-game-name"></span>
 					</div>
+					<div class="arcade-stage" id="arcade-stage"></div>
 				</div>
 				<p class="arcade-hint">
-					Click the board, then press Space to start. Arrow keys or WASD to steer.
+					Click the board, then press Space to start. It pauses when it loses focus.
 				</p>
 			</div>
 		</section>
@@ -205,6 +230,12 @@
 
 			showArcade();
 
+			const gallery = document.getElementById("arcade-gallery");
+			const player = document.getElementById("arcade-player");
+			const stage = document.getElementById("arcade-stage");
+			const gameName = document.getElementById("arcade-game-name");
+			const loaded = new Map();
+
 			const target = location.hash
 				? document.getElementById(location.hash.slice(1))
 				: null;
@@ -218,27 +249,65 @@
 				}
 			};
 
-			// bevy focuses the canvas once its render pipeline is ready, which
-			// can happen well after init() resolves and scrolls it into view —
-			// snap back from that one automatic focus, but don't interfere
-			// with any focus the user causes themselves afterwards
-			document.addEventListener("focusin", restoreScroll, { once: true });
-
-			try {
-				const { default: init } = await import("/arcade/snake.js");
-				await init();
-				restoreScroll();
-
-				const canvas = document.getElementById("snake-canvas");
-				canvas?.focus({ preventScroll: true });
-				canvas?.addEventListener("click", () => canvas.focus());
-				} catch (err) {
-					console.error("Failed to load arcade:", err);
-					hideArcade();
-				}
+			function showGallery() {
+				player.classList.add("arcade-hidden");
+				gallery.classList.remove("arcade-hidden");
+				// every canvas is now hidden, so each game sees an unfocused window and pauses
+				for (const canvas of loaded.values()) canvas.classList.add("arcade-hidden");
 			}
 
-			main();
+			async function play(name, label) {
+				gallery.classList.add("arcade-hidden");
+				player.classList.remove("arcade-hidden");
+				gameName.textContent = label;
+
+				for (const [other, canvas] of loaded) {
+					canvas.classList.toggle("arcade-hidden", other !== name);
+				}
+
+				let canvas = loaded.get(name);
+				if (!canvas) {
+					canvas = document.createElement("canvas");
+					canvas.id = `${name}-canvas`;
+					canvas.className = "arcade-canvas";
+					canvas.tabIndex = 0;
+					canvas.setAttribute("aria-label", `${label} game board`);
+					canvas.addEventListener("click", () => canvas.focus({ preventScroll: true }));
+					stage.appendChild(canvas);
+					loaded.set(name, canvas);
+
+					// bevy focuses the canvas once its render pipeline is ready, which
+					// can happen well after init() resolves and scrolls it into view —
+					// snap back from that one automatic focus, but don't interfere
+					// with any focus the user causes themselves afterwards
+					document.addEventListener("focusin", restoreScroll, { once: true });
+					const { default: init } = await import(`/arcade/${name}.js`);
+					await init();
+				}
+
+				player.scrollIntoView({ block: "center" });
+				canvas.focus({ preventScroll: true });
+			}
+
+			for (const card of gallery.querySelectorAll(".game-card")) {
+				card.addEventListener("click", () => {
+					const name = card.dataset.game;
+					const label = card.querySelector("h3").textContent.trim();
+					play(name, label).catch((err) => {
+						// one broken game shouldn't take the whole arcade with it
+						console.error(`Failed to load ${name}:`, err);
+						loaded.get(name)?.remove();
+						loaded.delete(name);
+						card.remove();
+						showGallery();
+					});
+				});
+			}
+
+			document.getElementById("arcade-back").addEventListener("click", showGallery);
+		}
+
+		main();
 	</script>
 </body>
 </html>

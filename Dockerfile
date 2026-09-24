@@ -26,7 +26,7 @@ COPY site ./site
 COPY games ./games
 
 RUN mkdir -p /work/site/public/arcade
-RUN ./build-games.sh snake
+RUN ./build-games.sh snake pong breakout tetris
 
 # --------------------
 

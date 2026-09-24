@@ -1,5 +1,5 @@
+use arcade_core::{ArcadePlugin, GamePhase, despawn_hint, focused, spawn_hint};
 use bevy::prelude::*;
-use bevy::window::PrimaryWindow;
 
 const GRID_WIDTH: i32 = 20;
 const GRID_HEIGHT: i32 = 20;
@@ -7,49 +7,41 @@ const CELL_SIZE: f32 = 20.; // pixels per cell
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins.set(WindowPlugin {
-            primary_window: Some(Window {
-                canvas: Some("#snake-canvas".into()),
-                fit_canvas_to_parent: true,
-                ..default()
-            }),
-            ..default()
-        }))
-        .init_state::<GameState>()
+        .add_plugins(ArcadePlugin {
+            canvas: "#snake-canvas",
+        })
         .insert_resource(Score(0))
         .insert_resource(SnakeBody {
             positions: vec![IVec2::new(10, 10)],
         })
         .insert_resource(SnakeDirection(Direction::Up))
         .add_event::<FruitEatenEvent>()
-        .add_systems(Startup, setup)
+        .add_systems(Startup, (setup, show_start_text))
+        .add_systems(
+            Update,
+            start.run_if(not(in_state(GamePhase::Playing))).run_if(focused),
+        )
         .add_systems(
             Update,
             (
-                start.run_if(in_state(GameState::GameOver)),
-                handle_input.run_if(in_state(GameState::Running)),
-                move_snake.run_if(in_state(GameState::Running)),
-                check_death_collision.run_if(in_state(GameState::Running)),
-                check_fruit_collision.run_if(in_state(GameState::Running)),
-                handle_fruit_eaten.run_if(in_state(GameState::Running)),
-                grow_snake.run_if(in_state(GameState::Running)),
-                update_score_text,
+                handle_input,
+                move_snake,
+                check_death_collision,
+                check_fruit_collision,
+                handle_fruit_eaten,
+                grow_snake,
             )
-                .chain(),
+                .chain()
+                .run_if(in_state(GamePhase::Playing))
+                .run_if(focused),
         )
+        .add_systems(Update, update_score_text)
         .add_systems(
-            OnEnter(GameState::GameOver),
+            OnEnter(GamePhase::GameOver),
             (show_start_text, cleanup_entities),
         )
-        .add_systems(OnEnter(GameState::Running), hide_start_text)
+        .add_systems(OnEnter(GamePhase::Playing), despawn_hint)
         .run();
-}
-
-#[derive(States, Clone, Eq, PartialEq, Debug, Hash, Default)]
-enum GameState {
-    Running,
-    #[default]
-    GameOver,
 }
 
 #[derive(Resource)]
@@ -85,9 +77,6 @@ struct Score(usize);
 #[derive(Component)]
 struct ScoreText;
 
-#[derive(Component)]
-struct StartText;
-
 fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
@@ -120,7 +109,7 @@ fn setup(
 fn start(
     keys: Res<ButtonInput<KeyCode>>,
     mut commands: Commands,
-    mut next_state: ResMut<NextState<GameState>>,
+    mut next_state: ResMut<NextState<GamePhase>>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
     mut score: ResMut<Score>,
@@ -145,7 +134,7 @@ fn start(
 
         spawn_fruit(&mut commands, &mut meshes, &mut materials);
 
-        next_state.set(GameState::Running);
+        next_state.set(GamePhase::Playing);
     }
 }
 
@@ -156,55 +145,32 @@ fn grid_to_world(pos: IVec2) -> Vec3 {
 }
 
 fn handle_input(
-    windows: Query<&Window, With<PrimaryWindow>>,
     keyboard_input: Res<ButtonInput<KeyCode>>,
     mut direction: ResMut<SnakeDirection>,
 ) {
-    let Ok(window) = windows.single() else {
-        return;
-    };
+    let pressed = |a, b| keyboard_input.just_pressed(a) || keyboard_input.just_pressed(b);
 
-    if !window.focused {
-        return;
-    }
-    if keyboard_input.just_pressed(KeyCode::ArrowUp)
-        || keyboard_input.just_pressed(KeyCode::KeyW) && direction.0 != Direction::Down
-    {
+    if pressed(KeyCode::ArrowUp, KeyCode::KeyW) && direction.0 != Direction::Down {
         direction.0 = Direction::Up;
     }
-    if keyboard_input.just_pressed(KeyCode::ArrowDown)
-        || keyboard_input.just_pressed(KeyCode::KeyS) && direction.0 != Direction::Up
-    {
+    if pressed(KeyCode::ArrowDown, KeyCode::KeyS) && direction.0 != Direction::Up {
         direction.0 = Direction::Down;
     }
-    if keyboard_input.just_pressed(KeyCode::ArrowLeft)
-        || keyboard_input.just_pressed(KeyCode::KeyA) && direction.0 != Direction::Right
-    {
+    if pressed(KeyCode::ArrowLeft, KeyCode::KeyA) && direction.0 != Direction::Right {
         direction.0 = Direction::Left;
     }
-    if keyboard_input.just_pressed(KeyCode::ArrowRight)
-        || keyboard_input.just_pressed(KeyCode::KeyD) && direction.0 != Direction::Left
-    {
+    if pressed(KeyCode::ArrowRight, KeyCode::KeyD) && direction.0 != Direction::Left {
         direction.0 = Direction::Right;
     }
 }
 
 fn move_snake(
-    windows: Query<&Window, With<PrimaryWindow>>,
     time: Res<Time>,
     mut body: ResMut<SnakeBody>,
     mut segments: Query<&mut Transform, With<SnakeSegment>>,
     mut timer: Local<Timer>,
     direction: Res<SnakeDirection>,
 ) {
-    let Ok(window) = windows.single() else {
-        return;
-    };
-
-    if !window.focused {
-        return;
-    }
-
     if timer.duration().is_zero() {
         *timer = Timer::from_seconds(0.2, TimerMode::Repeating);
     }
@@ -264,18 +230,18 @@ fn check_fruit_collision(
     }
 }
 
-fn check_death_collision(body: Res<SnakeBody>, mut next_state: ResMut<NextState<GameState>>) {
+fn check_death_collision(body: Res<SnakeBody>, mut next_state: ResMut<NextState<GamePhase>>) {
     let head = body.positions[0];
 
     // wall collision
     if head.x < 0 || head.x >= GRID_WIDTH || head.y < 0 || head.y >= GRID_HEIGHT {
-        next_state.set(GameState::GameOver);
+        next_state.set(GamePhase::GameOver);
         return;
     }
 
     // self collision (ignore last tail segment because it moves)
     if body.positions.len() > 2 && body.positions[1..body.positions.len() - 1].contains(&head) {
-        next_state.set(GameState::GameOver);
+        next_state.set(GamePhase::GameOver);
     }
 }
 
@@ -357,16 +323,5 @@ fn cleanup_entities(
 }
 
 fn show_start_text(mut commands: Commands) {
-    commands.spawn((
-        Text2d::new("Press Space to Start"),
-        TextLayout::new(JustifyText::Center, LineBreak::WordBoundary),
-        Transform::from_xyz(0.0, 0.0, 1.0),
-        StartText,
-    ));
-}
-
-fn hide_start_text(mut commands: Commands, query: Query<Entity, With<StartText>>) {
-    for e in &query {
-        commands.entity(e).despawn();
-    }
+    spawn_hint(&mut commands, "Press Space to Start");
 }
