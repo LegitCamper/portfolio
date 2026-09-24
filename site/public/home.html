@@ -1,3 +1,5 @@
+<!doctype html>
+<html lang="en">
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -14,141 +16,159 @@
 	<link rel="icon" href="/favicon.svg" type="image/svg+xml">
 </head>
 <body>
-	<div class="navbar">
+	<a class="skip-link" href="#content">Skip to content</a>
+
+	<nav class="navbar" aria-label="Sections">
 		<a href="#intro">Home</a>
 		<a href="#about_me">About Me</a>
 		<a href="#skills">Skills</a>
 		<a id="arcade-link" class="arcade-hidden" href="#arcade">Arcade</a>
 		<a href="#projects">Projects</a>
-	</div>
+	</nav>
 
-	<div id="intro" class="section">
-		<img src="assets/headshot.jpg" width="200" height="300" alt="Headshot">
-		<h1>Sawyer Bristol</h1>
-		<h3>Systems Programmer Specializing in Rust</h3>
+	<main id="content">
+		<section id="intro" class="section">
+			<img src="assets/headshot.jpg" width="200" height="300" alt="Headshot" fetchpriority="high">
+			<h1>Sawyer Bristol</h1>
+			<p class="tagline">Systems Programmer Specializing in Rust</p>
 
-		<div class="socials">
-			<a href="https://github.com/LegitCamper" target="_blank" rel="noopener noreferrer">
-				<img src="https://img.shields.io/github/stars/LegitCamper?style=social" alt="GitHub stars">
-			</a>
-			<a class="devicon-linkedin-plain"
-			   href="https://www.linkedin.com/in/sawyerbristol/"
-			></a>
-		</div>
-	</div>
-
-	<div class="section" id="about_me">
-		<div class="section_box">
-			<h1>About Me</h1>
-			<img src="assets/me_programming.jpg" width="145" height="210" alt="Me programming">
-			<div class="bio">
-				<p>
-					A passionate systems programmer
-					with a strong interest in DevOps,
-					eager to apply my skills to
-					contribute and solve difficult problems.
-				</p>
-
-				<a class="btn" href="assets/resume.pdf" download>
-					Download Resume
+			<div class="socials">
+				<a href="https://github.com/LegitCamper" target="_blank" rel="noopener noreferrer">
+					<img src="https://img.shields.io/github/stars/LegitCamper?style=social" height="20" decoding="async" alt="GitHub stars">
 				</a>
+				<a class="social-icon"
+				   href="https://www.linkedin.com/in/sawyerbristol/"
+				   target="_blank"
+				   rel="noopener noreferrer"
+				   aria-label="LinkedIn profile"
+				><i class="devicon-linkedin-plain" aria-hidden="true"></i></a>
 			</div>
-		</div>
-	</div>
+		</section>
 
-	<div class="section" id="skills">
-		<div class="section_box">
-			<h1>Skills</h1>
-			<ul class="skills">
-				<li>
-					<strong>Programming Languages:</strong>
-					Bash, Rust, Golang, C, Python, Lua,
-					Nix/NixOS
-				</li>
-				<li>
-					<strong>Deployment Technologies:</strong>
-					Kubernetes, Docker, GitHub
-					Actions, Azure DevOps, Ansible, CI/CD
-				</li>
-				<li>
-					<strong>Infrastructure:</strong>
-					AWS, Azure, Google Cloud, DigitalOcean
-				</li>
-				<li>
-					<strong>Networking:</strong>
-					Nginx/Traefik (HTTP, HTTPS, TCP, UDP routing),
-					IPTables, Tailscale
-				</li>
-				<li>
-					<strong>Interests:</strong>
-					Systems & Embedded programming, cyber-security,
-					and self-hosting
-				</li>
-			</ul>
-		</div>
-	</div>
+		<section class="section" id="about_me" aria-labelledby="about_me-title">
+			<div class="section_box">
+				<h2 id="about_me-title">About Me</h2>
+				<img src="assets/me_programming.jpg" width="145" height="210" alt="Me programming" loading="lazy" decoding="async">
+				<div class="bio">
+					<p>
+						A passionate systems programmer
+						with a strong interest in DevOps,
+						eager to apply my skills to
+						contribute and solve difficult problems.
+					</p>
 
-	<div class="section arcade-hidden" id="arcade">
-		<div class="section_box">
-			<h1>Arcade</h1>
-			<div class="arcade">
-				<div>
-					<canvas id="snake-canvas" tabindex="0"></canvas>
+					<a class="btn" href="assets/resume.pdf" download>
+						Download Resume
+					</a>
 				</div>
 			</div>
-		</div>
-	</div>
+		</section>
 
-	<div class="section" id="projects">
-		<div class="section_box">
-			<h1>Projects</h1>
+		<section class="section" id="skills" aria-labelledby="skills-title">
+			<div class="section_box">
+				<h2 id="skills-title">Skills</h2>
+				<dl class="skills">
+					<dt>Programming Languages</dt>
+					<dd>
+						Bash, Rust, Golang, C, Python, Lua,
+						Nix/NixOS
+					</dd>
 
-			<div class="project-card icy_browser">
-				<h3>Icy Browser & Components</h3>
-				<img src="https://github.com/LegitCamper/icy_browser/blob/main/assets/basic_browser.png?raw=true" alt="Icy Browser screenshot">
-				<a href="https://github.com/LegitCamper/iced_webview">Iced Webview</a>
-				<p>A Iced library to embed webpages in native iced applications</p>
+					<dt>Deployment Technologies</dt>
+					<dd>
+						Kubernetes, Docker, GitHub
+						Actions, Azure DevOps, Ansible, CI/CD
+					</dd>
 
-				<a href="https://github.com/LegitCamper/icy_browser">Icy_browser</a>
-				<p>
-					An Iced library built on Iced web view to build browser. Includes tab bar, navigation bar, and bookmark bar
-				</p>
+					<dt>Infrastructure</dt>
+					<dd>AWS, Azure, Google Cloud, DigitalOcean</dd>
 
-				<a href="https://github.com/LegitCamper/rust-browser">Rust browser</a>
-				<p>
-					Uses the above two libraries to create my own shortcut driven browser in Rust!
+					<dt>Networking</dt>
+					<dd>
+						Nginx/Traefik (HTTP, HTTPS, TCP, UDP routing),
+						IPTables, Tailscale
+					</dd>
+
+					<dt>Interests</dt>
+					<dd>
+						Systems &amp; Embedded programming, cyber-security,
+						and self-hosting
+					</dd>
+				</dl>
+			</div>
+		</section>
+
+		<section class="section arcade-hidden" id="arcade" aria-labelledby="arcade-title">
+			<div class="section_box">
+				<h2 id="arcade-title">Arcade</h2>
+				<div class="arcade">
+					<div>
+						<canvas id="snake-canvas" tabindex="0" aria-label="Snake game board"></canvas>
+					</div>
+				</div>
+				<p class="arcade-hint">
+					Click the board, then press Space to start. Arrow keys or WASD to steer.
 				</p>
 			</div>
+		</section>
 
-			<div class="project-card homelab">
-				<h3>
-					<a href="https://github.com/LegitCamper/homelab">My homelab repo</a>
-				</h3>
-				<p>
-					This is repo where I host all the containers
-					I use in my Homelab along with all the Ansible
-					scripts and CI/CD that makes the magic happen.
-					This is also the server I am using to
-					host this very site. Magical!
-				</p>
-			</div>
+		<section class="section" id="projects" aria-labelledby="projects-title">
+			<h2 id="projects-title">Projects</h2>
 
-			<div class="project-card portfolio">
-				<h3>
-					<a href="https://github.com/LegitCamper/portfolio">My portfolio site!</a>
-				</h3>
-				<p>
-					I can't forget about this site!
-					A static site written in Rust which uses the
-					rocket webserver to create
-					blazingly fast static sites like this one.
-					I am using github actions to build a new container
-					and my homelab repo to automatically run ansible
-					and redeploy this site
-				</p>
+			<div class="projects-grid">
+				<div class="project-card icy_browser">
+					<h3>Icy Browser &amp; Components</h3>
+					<img src="https://github.com/LegitCamper/icy_browser/blob/main/assets/basic_browser.png?raw=true" alt="Icy Browser screenshot" loading="lazy" decoding="async">
+					<ul class="project-links">
+						<li>
+							<a href="https://github.com/LegitCamper/iced_webview">Iced Webview</a>
+							<p>A Iced library to embed webpages in native iced applications</p>
+						</li>
+						<li>
+							<a href="https://github.com/LegitCamper/icy_browser">Icy_browser</a>
+							<p>
+								An Iced library built on Iced web view to build browser. Includes tab bar, navigation bar, and bookmark bar
+							</p>
+						</li>
+						<li>
+							<a href="https://github.com/LegitCamper/rust-browser">Rust browser</a>
+							<p>
+								Uses the above two libraries to create my own shortcut driven browser in Rust!
+							</p>
+						</li>
+					</ul>
+				</div>
+
+				<div class="project-card homelab">
+					<h3>
+						<a href="https://github.com/LegitCamper/homelab">My homelab repo</a>
+					</h3>
+					<p>
+						This is repo where I host all the containers
+						I use in my Homelab along with all the Ansible
+						scripts and CI/CD that makes the magic happen.
+						This is also the server I am using to
+						host this very site. Magical!
+					</p>
+				</div>
+
+				<div class="project-card portfolio">
+					<h3>
+						<a href="https://github.com/LegitCamper/portfolio">My portfolio site!</a>
+					</h3>
+					<p>
+						I can't forget about this site!
+						A static site written in Rust which uses the
+						rocket webserver to create
+						blazingly fast static sites like this one.
+						I am using github actions to build a new container
+						and my homelab repo to automatically run ansible
+						and redeploy this site
+					</p>
+				</div>
 			</div>
-		</div>
-	</div>
+		</section>
+	</main>
 
 	<footer class="site-footer">
 		<p>&copy; 2026 Sawyer Bristol &middot; built with Rust &amp; Rocket &middot;
@@ -161,28 +181,28 @@
 			document.getElementById("arcade")?.remove();
 			document.getElementById("arcade-link")?.remove();
 		}
-		
+
 		function showArcade() {
 			document.getElementById("arcade")?.classList.remove("arcade-hidden");
 			document.getElementById("arcade-link")?.classList.remove("arcade-hidden");
 		}
-		
+
 		function hasWebGL() {
 			const canvas = document.createElement("canvas");
-			
+
 			return !!(
 			canvas.getContext("webgl2") ||
 			canvas.getContext("webgl") ||
 			canvas.getContext("experimental-webgl")
 			);
 		}
-		
+
 		async function main() {
 			if (!hasWebGL()) {
 				hideArcade();
 				return;
 			}
-			
+
 			showArcade();
 
 			const target = location.hash
@@ -217,7 +237,8 @@
 					hideArcade();
 				}
 			}
-			
+
 			main();
 	</script>
 </body>
+</html>
